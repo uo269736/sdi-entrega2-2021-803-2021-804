@@ -91,7 +91,7 @@ routerUsuarioSession.use(function(req, res, next) {
 
 //Aplicar routerUsuarioSession
 app.use("/oferta/agregar",routerUsuarioSession);
-app.use("/oferta/list/propias",routerUsuarioSession);
+app.use("/oferta/propias",routerUsuarioSession);
 app.use("/oferta/list",routerUsuarioSession);
 app.use("/oferta/compradas",routerUsuarioSession);
 
