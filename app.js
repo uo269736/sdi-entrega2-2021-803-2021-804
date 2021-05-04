@@ -116,7 +116,7 @@ routerUsuarioVendedor.use(function(req, res, next) {
 });
 
 //Aplicar routerUsuarioAutor
-app.use("/oferta/eliminar",routerUsuarioAutor);
+app.use("/oferta/eliminar",routerUsuarioVendedor);
 
 
 app.use(express.static('public'));
