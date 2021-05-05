@@ -28,6 +28,7 @@ module.exports = function(app, swig, gestorBD) {
                     "?mensaje=Email o password incorrecto"+
                     "&tipoMensaje=alert-danger ");
             } else {
+                req.session.rol = usuarios[0].rol;
                 req.session.usuario = usuarios[0].email;
                 res.redirect("/home");
             }
@@ -42,7 +43,8 @@ module.exports = function(app, swig, gestorBD) {
             .update(req.body.password).digest('hex');
         let usuario = {
             email : req.body.email,
-            password : seguro
+            password : seguro,
+            rol : "usuario"
         }
 
         gestorBD.insertarUsuario(usuario, function(id) {
