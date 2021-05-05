@@ -11,7 +11,10 @@ module.exports = function(app, swig, gestorBD) {
         res.send(respuesta);
     });
     app.get("/home", function(req, res) {
-        let respuesta = swig.renderFile('views/home.html', {});
+        let respuesta = swig.renderFile('views/home.html', {
+            usuario : req.session.usuario,
+            rol : req.session.rol
+        });
         res.send(respuesta);
     });
     app.post("/identificarse", function(req, res) {

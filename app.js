@@ -73,7 +73,7 @@ routerUsuarioToken.use(function(req, res, next) {
     }
 });
 // Aplicar routerUsuarioToken
-app.use('/api/oferta', routerUsuarioToken);
+//app.use('/api/oferta', routerUsuarioToken);
 
 
 // routerUsuarioSession
