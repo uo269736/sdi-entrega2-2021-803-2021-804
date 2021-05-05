@@ -15,8 +15,7 @@ module.exports = function(app, swig, gestorBD) {
             .update(req.body.password).digest('hex');
         let criterio = {
             email : req.body.email,
-            password : seguro,
-            rol : req.body.rol
+            password : seguro
         }
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
             if (usuarios == null || usuarios.length == 0) {
@@ -25,6 +24,7 @@ module.exports = function(app, swig, gestorBD) {
                     "?mensaje=Email o password incorrecto"+
                     "&tipoMensaje=alert-danger ");
             } else {
+                req.session.rol = usuarios[0].rol;
                 req.session.usuario = usuarios[0].email;
                 res.redirect("/oferta/list");
             }

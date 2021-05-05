@@ -94,7 +94,7 @@ module.exports = function(app,swig,gestorBD) {
     app.get("/oferta/list", function(req, res) {
         let criterio = {};
         if( req.query.busqueda != null ){
-            criterio = { "nombre" : {$regex : ".*"+req.query.busqueda+".*"} };
+            criterio = { "titulo" : {$regex : ".*"+req.query.busqueda+".*"} };
         }
 
         let pg = parseInt(req.query.pg); // Es String !!!
@@ -102,8 +102,8 @@ module.exports = function(app,swig,gestorBD) {
             pg = 1;
         }
 
-        gestorBD.obtenerCancionesPg(criterio, pg , function(canciones, total ) {
-            if (canciones == null) {
+        gestorBD.obtenerOfertasPg(criterio, pg , function(ofertas, total ) {
+            if (ofertas == null) {
                 let respuestaError = swig.renderFile('views/error.html',
                     {
                         mensajes : "Error al listar"
@@ -120,9 +120,9 @@ module.exports = function(app,swig,gestorBD) {
                         paginas.push(i);
                     }
                 }
-                let respuesta = swig.renderFile('views/btienda.html',
+                let respuesta = swig.renderFile('views/bofertas.html',
                     {
-                        canciones : canciones,
+                        ofertas : ofertas,
                         paginas : paginas,
                         actual : pg
                     });
