@@ -2,14 +2,17 @@ module.exports = function(app, swig, gestorBD) {
     app.get("/usuarios", function(req, res) {
         res.send("ver usuarios");
     });
+
     app.get("/registrarse", function(req, res) {
         let respuesta = swig.renderFile('views/bregistro.html', {});
         res.send(respuesta);
     });
+
     app.get("/identificarse", function(req, res) {
         let respuesta = swig.renderFile('views/bidentificacion.html', {});
         res.send(respuesta);
     });
+
     app.get("/home", function(req, res) {
         let respuesta = swig.renderFile('views/home.html', {
             usuario : req.session.usuario,
@@ -17,6 +20,7 @@ module.exports = function(app, swig, gestorBD) {
         });
         res.send(respuesta);
     });
+
     app.post("/identificarse", function(req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
@@ -37,10 +41,12 @@ module.exports = function(app, swig, gestorBD) {
             }
         });
     });
+
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
-        res.send("Usuario desconectado");
+        res.redirect("/identificarse");
     });
+
     app.post('/usuario', function(req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
