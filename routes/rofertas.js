@@ -19,89 +19,15 @@ module.exports = function(app,swig,gestorBD) {
             }
         });
     })
-
-    app.get('/oferta/:id', function(req, res) {
-        let criterioComentario = {"cancion_id": gestorBD.mongo.ObjectID(req.params.id)};
-        let criterioCancion = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
-        let resComentarios;
-        gestorBD.obtenerCanciones(criterioCancion, function (canciones) {
-            if (canciones == null) {
-                let respuestaError = swig.renderFile('views/error.html',
-                    {
-                        mensajes: "Error al recuperar la canción."
-                    });
-                res.send(respuestaError);
-            } else {
-                gestorBD.obtenerComentarios(criterioComentario, function (comentarios) {
-                    let criterioCompra = {"usuario": req.session.usuario};
-                    gestorBD.obtenerCompras(criterioCompra, function (compras) {
-                        if (compras == null) {
-                            res.send("Error al listar");
-                        } else {
-                            let booleanAutorComprada = isAutorOrComprada(compras, canciones[0], req.session.usuario);
-                            resComentarios = comentarios;
-                            let configuracion = {
-                                url: "https://www.freeforexapi.com/api/live?pairs=EURUSD",
-                                method: "get",
-                                headers: {
-                                    "token": "ejemplo",
-                                }
-                            }
-                            let rest = app.get("rest");
-                            rest(configuracion, function (error, response, body) {
-                                console.log("cod: " + response.statusCode + " Cuerpo :" + body);
-                                let objetoRespuesta = JSON.parse(body);
-                                let cambioUSD = objetoRespuesta.rates.EURUSD.rate;
-                                // nuevo campo "usd"
-                                canciones[0].usd = cambioUSD * canciones[0].precio;
-                                let respuesta = swig.renderFile('views/bcancion.html',
-                                    {
-                                        cancion: canciones[0],
-                                        comentarios: resComentarios,
-                                        isAutorComprada: booleanAutorComprada
-                                    });
-                                res.send(respuesta);
-                            });
-                        }
-                    });
-                });
-            }
-        });
-    });
-
-    app.post("/oferta", function (req, res){
-        let oferta = {
-            nombre : req.body.nombre,
-            descripcion : req.body.descripcion,
-            precio : req.body.precio,
-            vendedor: req.session.usuario,
-            comprador : null
-        }
-        // Conectarse
-        gestorBD.insertarOferta(oferta, function(id){
-            if (id == null) {
-                let respuestaError = swig.renderFile('views/error.html',
-                    {
-                        mensajes : "Error al insertar canción"
-                    });
-                res.send(respuestaError);
-            } else {
-                res.redirect("/oferta/list");
-            }
-        });
-    });
-
     app.get("/oferta/list", function(req, res) {
         let criterio = {};
         if( req.query.busqueda != null ){
             criterio = { "titulo" : {$regex : ".*"+req.query.busqueda+".*"} };
         }
-
-        let pg = parseInt(req.query.pg); // Es String !!!
-        if ( req.query.pg == null){ // Puede no venir el param
+        let pg = parseInt(req.query.pg);
+        if ( req.query.pg == null){
             pg = 1;
         }
-
         gestorBD.obtenerOfertasPg(criterio, pg , function(ofertas, total ) {
             if (ofertas == null) {
                 let respuestaError = swig.renderFile('views/error.html',
@@ -130,7 +56,6 @@ module.exports = function(app,swig,gestorBD) {
             }
         });
     });
-
     app.get("/oferta/propias", function(req, res) {
         let criterio = { vendedor : req.session.usuario };
         gestorBD.obtenerOfertas(criterio, function(ofertas) {
@@ -212,13 +137,80 @@ module.exports = function(app,swig,gestorBD) {
                     cancionesCompradasIds.push( compras[i].cancionId );
                 }
                 let criterio = { "_id" : { $in: cancionesCompradasIds } }
-                gestorBD.obtenerCanciones(criterio,function (canciones){
+                gestorBD.obtenerOfertas(criterio,function (canciones){
                     let respuesta = swig.renderFile('views/bcompras.html',
                         {
                             canciones : canciones
                         });
                     res.send(respuesta);
                 });
+            }
+        });
+    });
+
+    app.get('/oferta/:id', function(req, res) {
+        let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
+        gestorBD.obtenerOfertas(criterio, function (canciones) {
+            if (canciones == null) {
+                let respuestaError = swig.renderFile('views/error.html',
+                    {
+                        mensajes: "Error al recuperar la canción."
+                    });
+                res.send(respuestaError);
+            } else {
+                let criterioCompra = {"usuario": req.session.usuario};
+                gestorBD.obtenerCompras(criterioCompra, function (compras) {
+                    if (compras == null) {
+                        res.send("Error al listar");
+                    } else {
+                        let booleanAutorComprada = isAutorOrComprada(compras, canciones[0], req.session.usuario);
+                        resComentarios = comentarios;
+                        let configuracion = {
+                            url: "https://www.freeforexapi.com/api/live?pairs=EURUSD",
+                            method: "get",
+                            headers: {
+                                "token": "ejemplo",
+                            }
+                        }
+                        let rest = app.get("rest");
+                        rest(configuracion, function (error, response, body) {
+                            console.log("cod: " + response.statusCode + " Cuerpo :" + body);
+                            let objetoRespuesta = JSON.parse(body);
+                            let cambioUSD = objetoRespuesta.rates.EURUSD.rate;
+                            // nuevo campo "usd"
+                            canciones[0].usd = cambioUSD * canciones[0].precio;
+                            let respuesta = swig.renderFile('views/bcancion.html',
+                                {
+                                    cancion: canciones[0],
+                                    comentarios: resComentarios,
+                                    isAutorComprada: booleanAutorComprada
+                                });
+                            res.send(respuesta);
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    app.post("/oferta", function (req, res){
+        let oferta = {
+            titulo : req.body.nombre,
+            descripcion : req.body.descripcion,
+            precio : req.body.precio,
+            vendedor: req.session.usuario,
+            comprador : null
+        }
+        // Conectarse
+        gestorBD.insertarOferta(oferta, function(id){
+            if (id == null) {
+                let respuestaError = swig.renderFile('views/error.html',
+                    {
+                        mensajes : "Error al insertar canción"
+                    });
+                res.send(respuestaError);
+            } else {
+                res.redirect("/oferta/list");
             }
         });
     });
@@ -235,7 +227,5 @@ module.exports = function(app,swig,gestorBD) {
             return false;
         }
     };
-
-
 
 };
