@@ -7,7 +7,8 @@ module.exports = function(app, swig, gestorBD) {
                     {
                         mensajes : "Error al listar",
                         usuario : req.session.usuario,
-                        rol : req.session.rol
+                        rol : req.session.rol,
+                        saldo : req.session.saldo
                     });
                 res.send(respuestaError);
             } else {
@@ -15,7 +16,8 @@ module.exports = function(app, swig, gestorBD) {
                     {
                         usuarios : usuarios,
                         usuario : req.session.usuario,
-                        rol : req.session.rol
+                        rol : req.session.rol,
+                        saldo : req.session.saldo
                     });
                 res.send(respuesta);
             }
@@ -50,7 +52,8 @@ module.exports = function(app, swig, gestorBD) {
                     {
                         mensajes: "Error al eliminar",
                         usuario: req.session.usuario,
-                        rol: req.session.rol
+                        rol: req.session.rol,
+                        saldo : req.session.saldo
                     });
                 res.send(respuestaError);
             }else{
@@ -76,7 +79,8 @@ module.exports = function(app, swig, gestorBD) {
     app.get("/home", function(req, res) {
         let respuesta = swig.renderFile('views/home.html', {
             usuario : req.session.usuario,
-            rol : req.session.rol
+            rol : req.session.rol,
+            saldo : req.session.saldo
         });
         res.send(respuesta);
     });
@@ -97,6 +101,7 @@ module.exports = function(app, swig, gestorBD) {
             } else {
                 req.session.rol = usuarios[0].rol;
                 req.session.usuario = usuarios[0].email;
+                req.session.saldo = usuarios[0].saldo;
                 res.redirect("/home");
             }
         });
@@ -115,7 +120,8 @@ module.exports = function(app, swig, gestorBD) {
             password : seguro,
             nombre : req.body.nombre,
             apellidos : req.body.apellidos,
-            rol : "usuario"
+            rol : "usuario",
+            saldo : "100.00"
         }
 
         gestorBD.insertarUsuario(usuario, function(id) {
@@ -124,6 +130,7 @@ module.exports = function(app, swig, gestorBD) {
             } else {
                 req.session.rol = usuario.rol;
                 req.session.usuario = usuario.email;
+                req.session.saldo = usuario.saldo;
                 res.redirect("/home?mensaje=Nuevo usuario registrado");
             }
         });

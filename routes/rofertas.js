@@ -5,7 +5,8 @@ module.exports = function(app,swig,gestorBD) {
     app.get('/oferta/agregar', function (req, res) {
         let respuesta = swig.renderFile('views/bagregar.html', {
             usuario : req.session.usuario,
-            rol : req.session.rol
+            rol : req.session.rol,
+            saldo : req.session.saldo
         });
         res.send(respuesta);
     });
@@ -38,7 +39,8 @@ module.exports = function(app,swig,gestorBD) {
                     {
                         mensajes : "Error al listar",
                         usuario : req.session.usuario,
-                        rol : req.session.rol
+                        rol : req.session.rol,
+                        saldo : req.session.saldo
                     });
                 res.send(respuestaError);
             } else {
@@ -58,7 +60,8 @@ module.exports = function(app,swig,gestorBD) {
                         paginas : paginas,
                         actual : pg,
                         usuario : req.session.usuario,
-                        rol : req.session.rol
+                        rol : req.session.rol,
+                        saldo : req.session.saldo
                     });
                 res.send(respuesta);
             }
@@ -73,7 +76,8 @@ module.exports = function(app,swig,gestorBD) {
                     {
                         mensajes : "Error al listar",
                         usuario : req.session.usuario,
-                        rol : req.session.rol
+                        rol : req.session.rol,
+                        saldo : req.session.saldo
                     });
                 res.send(respuestaError);
             } else {
@@ -81,7 +85,8 @@ module.exports = function(app,swig,gestorBD) {
                     {
                         ofertas : ofertas,
                         usuario : req.session.usuario,
-                        rol : req.session.rol
+                        rol : req.session.rol,
+                        saldo : req.session.saldo
                     });
                 res.send(respuesta);
             }
@@ -99,7 +104,10 @@ module.exports = function(app,swig,gestorBD) {
             if (canciones == null) {
                 let respuestaError = swig.renderFile('views/error.html',
                     {
-                        mensajes : "Error al recuperar la canción"
+                        mensajes : "Error al recuperar la canción",
+                        usuario : req.session.usuario,
+                        rol : req.session.rol,
+                        saldo : req.session.saldo
                     });
                 res.send(respuestaError);
             } else {
@@ -110,7 +118,8 @@ module.exports = function(app,swig,gestorBD) {
                             {
                                 mensajes : "Error al listar",
                                 usuario : req.session.usuario,
-                                rol : req.session.rol
+                                rol : req.session.rol,
+                                saldo : req.session.saldo
                             });
                         res.send(respuestaError);
                     } else {
@@ -119,7 +128,8 @@ module.exports = function(app,swig,gestorBD) {
                                 {
                                     mensajes : "No puedes comprar si eres el autor o ya la tienes comprada",
                                     usuario : req.session.usuario,
-                                    rol : req.session.rol
+                                    rol : req.session.rol,
+                                    saldo : req.session.saldo
                                 });
                             res.send(respuestaError);
                         } else {
@@ -147,7 +157,8 @@ module.exports = function(app,swig,gestorBD) {
                     {
                         mensajes : "Error al listar",
                         usuario : req.session.usuario,
-                        rol : req.session.rol
+                        rol : req.session.rol,
+                        saldo : req.session.saldo
                     });
                 res.send(respuestaError);
             } else {
@@ -161,7 +172,8 @@ module.exports = function(app,swig,gestorBD) {
                         {
                             canciones : canciones,
                             usuario : req.session.usuario,
-                            rol : req.session.rol
+                            rol : req.session.rol,
+                            saldo : req.session.saldo
                         });
                     res.send(respuesta);
                 });
@@ -177,7 +189,8 @@ module.exports = function(app,swig,gestorBD) {
                     {
                         mensajes: "Error al recuperar la oferta.",
                         usuario : req.session.usuario,
-                        rol : req.session.rol
+                        rol : req.session.rol,
+                        saldo : req.session.saldo
                     });
                 res.send(respuestaError);
             } else {
@@ -229,7 +242,10 @@ module.exports = function(app,swig,gestorBD) {
             if (id == null) {
                 let respuestaError = swig.renderFile('views/error.html',
                     {
-                        mensajes : "Error al insertar oferta"
+                        mensajes : "Error al insertar oferta",
+                        usuario : req.session.usuario,
+                        rol : req.session.rol,
+                        saldo : req.session.saldo
                     });
                 res.send(respuestaError);
             } else {
