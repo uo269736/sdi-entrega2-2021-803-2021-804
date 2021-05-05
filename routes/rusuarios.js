@@ -15,7 +15,8 @@ module.exports = function(app, swig, gestorBD) {
             .update(req.body.password).digest('hex');
         let criterio = {
             email : req.body.email,
-            password : seguro
+            password : seguro,
+            rol : req.body.rol
         }
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
             if (usuarios == null || usuarios.length == 0) {
@@ -38,7 +39,8 @@ module.exports = function(app, swig, gestorBD) {
             .update(req.body.password).digest('hex');
         let usuario = {
             email : req.body.email,
-            password : seguro
+            password : seguro,
+            rol : "usuario"
         }
 
         gestorBD.insertarUsuario(usuario, function(id) {
