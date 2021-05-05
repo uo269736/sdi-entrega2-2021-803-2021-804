@@ -10,6 +10,10 @@ module.exports = function(app, swig, gestorBD) {
         let respuesta = swig.renderFile('views/bidentificacion.html', {});
         res.send(respuesta);
     });
+    app.get("/home", function(req, res) {
+        let respuesta = swig.renderFile('views/home.html', {});
+        res.send(respuesta);
+    });
     app.post("/identificarse", function(req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
@@ -25,7 +29,7 @@ module.exports = function(app, swig, gestorBD) {
                     "&tipoMensaje=alert-danger ");
             } else {
                 req.session.usuario = usuarios[0].email;
-                res.redirect("/oferta/list");
+                res.redirect("/home");
             }
         });
     });

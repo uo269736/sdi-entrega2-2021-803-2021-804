@@ -75,24 +75,24 @@ module.exports = {
                 });
             }
         });
-    },/*
-    obtenerCanciones : function(criterio,funcionCallback){
+    },
+    obtenerOfertas : function(criterio,funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
                 funcionCallback(null);
             } else {
-                let collection = db.collection('canciones');
-                collection.find(criterio).toArray(function(err, canciones) {
+                let collection = db.collection('ofertas');
+                collection.find(criterio).toArray(function(err, ofertas) {
                     if (err) {
                         funcionCallback(null);
                     } else {
-                        funcionCallback(canciones);
+                        funcionCallback(ofertas);
                     }
                     db.close();
                 });
             }
         });
-    },*/
+    },
     insertarOferta : function(oferta, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {

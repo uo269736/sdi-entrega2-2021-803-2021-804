@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block titulo %} Home {% endblock %}
+
+{% block contenido_principal %}
+<div class="container" style="text-align: center">
+    <h2>Bienvenido</h2>
+    <h3>Esta es una zona privada la web</h3>
+    <p>
+			<span>
+			Usuario Autenticado como:</span>
+        <span>{{req.session.usuario}}</span>
+    </p>
+    <!--
+    <div class="table-responsive" sec:authorize="hasRole('ROLE_USUARIO')">
+        <table th:replace="fragments/tableOfertas" th:fragment="tableOfertas" id="tableOfertas"/>
+    </div>
+    -->
+</div>
+{% endblock %}

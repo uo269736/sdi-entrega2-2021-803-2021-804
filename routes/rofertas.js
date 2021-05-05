@@ -132,18 +132,18 @@ module.exports = function(app,swig,gestorBD) {
     });
 
     app.get("/oferta/propias", function(req, res) {
-        let criterio = { autor : req.session.usuario };
-        gestorBD.obtenerCanciones(criterio, function(canciones) {
-            if (canciones == null) {
+        let criterio = { vendedor : req.session.usuario };
+        gestorBD.obtenerOfertas(criterio, function(ofertas) {
+            if (ofertas == null) {
                 let respuestaError = swig.renderFile('views/error.html',
                     {
                         mensajes : "Error al listar"
                     });
                 res.send(respuestaError);
             } else {
-                let respuesta = swig.renderFile('views/bpublicaciones.html',
+                let respuesta = swig.renderFile('views/bpropias.html',
                     {
-                        canciones : canciones
+                        ofertas : ofertas
                     });
                 res.send(respuesta);
             }

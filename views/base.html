@@ -25,22 +25,39 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li id="gestionOfertas" class="dropdown">
-            <a class="dropdown-toogle" data-toggle="dropdown"
-               href="#">
-               Gestion de Ofertas <span class="caret"></span>
-            </a>
-              <ul class="dropdown-menu">
-                  <li><a href="/oferta/agregar">Agregar Oferta</a></li>
-                  <li><a href="/oferta/list" >Ver Ofertas</a></li>
-                  <li><a href="/oferta/propias">Ver Mis Ofertas</a></li>
-                  <li><a href="/oferta/compradas">Ver Mis Compras</a></li>
-              </ul>
-        </li>
+          {% if req.session.usuario!=null %}
+                <li id="gestionOfertas" class="dropdown" >
+                    <a class="dropdown-toogle" data-toggle="dropdown"
+                       href="#">
+                       Gestion de Ofertas <span class="caret"></span>
+                    </a>
+                      <ul class="dropdown-menu">
+                          <li><a href="/oferta/agregar">Agregar Oferta</a></li>
+                          <li><a href="/oferta/list" >Ver Ofertas</a></li>
+                          <li><a href="/oferta/propias">Ver Mis Ofertas</a></li>
+                          <li><a href="/oferta/compradas">Ver Mis Compras</a></li>
+                      </ul>
+                </li>
+          {% endif %}
+          {% if req.session.usuario!=null && req.session.rol==admin %}
+                  <li id="gestionUsuarios" class="dropdown" >
+                      <a class="dropdown-toogle" data-toggle="dropdown"
+                         href="#">
+                          Gestion de Usuarios <span class="caret"></span>
+                      </a>
+                      <ul class="dropdown-menu">
+                          <li><a href="/usuario/list">Ver Usuarios</a></li>
+                      </ul>
+                  </li>
+          {% endif %}
       </ul>
       <ul class="nav navbar-nav navbar-right">
-	    <li><a href="/registrarse"><span class="glyphicon glyphicon-user"></span> Registrate</a></li>
-        <li><a href="/identificarse"><span class="glyphicon glyphicon-log-in"></span> Identifícate</a></li>
+          {% if req.session.usuario ==null %}
+	            <li><a href="/registrarse"><span class="glyphicon glyphicon-user"></span> Registrate</a></li>
+                <li><a href="/identificarse"><span class="glyphicon glyphicon-log-in"></span> Identifícate</a></li>
+          {% else %}
+                <li><a href="/desconectarse"><span class="glyphicon glyphicon-log-out"></span> Desconectarse</a></li>
+          {% endif %}
       </ul>
     </div>
   </div>

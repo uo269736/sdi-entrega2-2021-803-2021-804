@@ -94,6 +94,7 @@ app.use("/oferta/agregar",routerUsuarioSession);
 app.use("/oferta/propias",routerUsuarioSession);
 app.use("/oferta/list",routerUsuarioSession);
 app.use("/oferta/compradas",routerUsuarioSession);
+app.use("/home",routerUsuarioSession);
 
 
 //routerUsuarioVendedor
