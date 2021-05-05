@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block titulo %} Usuarios – MyWallapop {% endblock %}
+{% block contenido_principal %}
+<h2>Ofertas</h2>
+<form method="post" action="/usuario/eliminar">
+    <table class="table table-hover" id="tableOfertas">
+        <thead>
+            <tr>
+                <th class="col-md-2">Email</th>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th class="col-md-1"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Inicio del Bloque oferta -->
+                {% for u in usuarios %}
+                <tr>
+                    <td>{{u.email}}</td>
+                    <td>{{u.nombre}}</td>
+                    <td>{{u.apellidos}}</td>
+                    {% if u.rol != "admin" %}
+                        <td><input type="checkbox" value={{u.email}} name="idChecked"></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a align="right"><button type="submit" class="btn btn-default pull-right">Eliminar</button></a>
+</form>
+<!-- Fin del Bloque oferta -->
+<!-- Paginación mostrar la actual y 2 anteriores y dos siguientes-->
+<div class="row text-center">
+    <ul class="pagination">
+        {% for pagina in paginas %}
+        <li class="page-item" id="pi-{{ pagina }}">
+            <a class="page-link" href="/oferta/list?pg={{ pagina }}">{{ pagina }}</a>
+        </li>
+        {% endfor %}
+        <script>
+            $("#pi-" + "{{ actual }}").addClass("active");
+        </script>
+    </ul>
+</div>
+
+{% endblock %}

@@ -119,6 +119,24 @@ routerUsuarioVendedor.use(function(req, res, next) {
 //Aplicar routerUsuarioAutor
 app.use("/oferta/eliminar",routerUsuarioVendedor);
 
+//routerUsuarioAdmin
+let routerUsuarioAdmin = express.Router();
+routerUsuarioAdmin.use(function(req, res, next) {
+    console.log("routerUsuarioAdmin");
+    if ( req.session.rol=="admin" ) {
+        // dejamos correr la petición
+        next();
+    } else {
+        console.log("va a : "+req.session.destino)
+        res.redirect("/identificarse");
+    }
+});
+
+//Aplicar routerAdmin
+app.use("/usuario/list",routerUsuarioAdmin);
+app.use("/usuario/eliminar",routerUsuarioAdmin);
+
+
 
 app.use(express.static('public'));
 

@@ -19,7 +19,8 @@ module.exports = function(app,swig,gestorBD) {
                 res.redirect("/publicaciones");
             }
         });
-    })
+    });
+
     app.get("/oferta/list", function(req, res) {
         let criterio = {};
         if( req.query.busqueda != null ){
@@ -55,7 +56,9 @@ module.exports = function(app,swig,gestorBD) {
                     {
                         ofertas : ofertas,
                         paginas : paginas,
-                        actual : pg
+                        actual : pg,
+                        usuario : req.session.usuario,
+                        rol : req.session.rol
                     });
                 res.send(respuesta);
             }
@@ -111,7 +114,7 @@ module.exports = function(app,swig,gestorBD) {
                             });
                         res.send(respuestaError);
                     } else {
-                        if (isAutorOrComprada(compras, canciones[0], req.session.usuario)) {
+                        if (isVendedorOrComprada(compras, canciones[0], req.session.usuario)) {
                             let respuestaError = swig.renderFile('views/error.html',
                                 {
                                     mensajes : "No puedes comprar si eres el autor o ya la tienes comprada",
@@ -168,11 +171,13 @@ module.exports = function(app,swig,gestorBD) {
 
     app.get('/oferta/:id', function(req, res) {
         let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
-        gestorBD.obtenerOfertas(criterio, function (canciones) {
-            if (canciones == null) {
+        gestorBD.obtenerOfertas(criterio, function (ofertas) {
+            if (ofertas == null) {
                 let respuestaError = swig.renderFile('views/error.html',
                     {
-                        mensajes: "Error al recuperar la canción."
+                        mensajes: "Error al recuperar la oferta.",
+                        usuario : req.session.usuario,
+                        rol : req.session.rol
                     });
                 res.send(respuestaError);
             } else {
@@ -181,7 +186,7 @@ module.exports = function(app,swig,gestorBD) {
                     if (compras == null) {
                         res.send("Error al listar");
                     } else {
-                        let booleanAutorComprada = isAutorOrComprada(compras, canciones[0], req.session.usuario);
+                        let booleanAutorComprada = isVendedorOrComprada(compras, ofertas[0], req.session.usuario);
                         resComentarios = comentarios;
                         let configuracion = {
                             url: "https://www.freeforexapi.com/api/live?pairs=EURUSD",
@@ -196,10 +201,10 @@ module.exports = function(app,swig,gestorBD) {
                             let objetoRespuesta = JSON.parse(body);
                             let cambioUSD = objetoRespuesta.rates.EURUSD.rate;
                             // nuevo campo "usd"
-                            canciones[0].usd = cambioUSD * canciones[0].precio;
+                            ofertas[0].usd = cambioUSD * ofertas[0].precio;
                             let respuesta = swig.renderFile('views/bcancion.html',
                                 {
-                                    cancion: canciones[0],
+                                    cancion: ofertas[0],
                                     comentarios: resComentarios,
                                     isAutorComprada: booleanAutorComprada
                                 });
@@ -224,7 +229,7 @@ module.exports = function(app,swig,gestorBD) {
             if (id == null) {
                 let respuestaError = swig.renderFile('views/error.html',
                     {
-                        mensajes : "Error al insertar canción"
+                        mensajes : "Error al insertar oferta"
                     });
                 res.send(respuestaError);
             } else {
@@ -233,12 +238,12 @@ module.exports = function(app,swig,gestorBD) {
         });
     });
 
-    function isAutorOrComprada(compras, cancion, usuario) {
+    function isVendedorOrComprada(compras, oferta, usuario) {
         if (cancion.autor == usuario) {
             return true;
         } else {
             for (let i = 0; i < compras.length; i++) {
-                if ((compras[i].cancionId).equals(cancion._id)) {
+                if ((compras[i].ofertaId).equals(oferta._id)) {
                     return true;
                 }
             }
