@@ -250,11 +250,11 @@ module.exports = function(app,swig,gestorBD) {
     });
 
     function isVendedorOrComprada(compras, oferta, usuario) {
-        if (oferta.autor == usuario) {
+        if ((oferta.vendedor) == usuario) {
             return true;
         } else {
             for (let i = 0; i < compras.length; i++) {
-                if ((compras[i].ofertaId).equals(oferta._id)) {
+                if ((compras[i]._id).equals(oferta._id)) {
                     return true;
                 }
             }
