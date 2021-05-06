@@ -25,7 +25,7 @@ module.exports = function(app,swig,gestorBD) {
     app.get("/oferta/list", function(req, res) {
         let criterio = {};
         if( req.query.busqueda != null ){
-            criterio = { "titulo" : {$regex : ".*"+req.query.busqueda+".*"} };
+            criterio = { "titulo" : {$regex : ".*"+req.query.busqueda+".*", $options: "i"} };
         }
 
         let pg = parseInt(req.query.pg); // Es String !!!
@@ -44,8 +44,8 @@ module.exports = function(app,swig,gestorBD) {
                     });
                 res.send(respuestaError);
             } else {
-                let ultimaPg = total/4;
-                if (total % 4 > 0 ){ // Sobran decimales
+                let ultimaPg = total/5;
+                if (total % 5 > 0 ){ // Sobran decimales
                     ultimaPg = ultimaPg+1;
                 }
                 let paginas = []; // paginas mostrar
@@ -121,7 +121,7 @@ module.exports = function(app,swig,gestorBD) {
                         if (isVendedorOrComprada(compras, ofertas[0], req.session.usuario)) {
                             let respuestaError = swig.renderFile('views/error.html',
                                 {
-                                    mensajes : "No puedes comprar si eres el autor o ya la tienes comprada",
+                                    mensajes : "No puedes comprar si eres el vendedor o ya la tienes comprada",
                                     usuario : req.session.usuario,
                                     rol : req.session.rol,
                                     saldo : req.session.saldo
@@ -129,7 +129,7 @@ module.exports = function(app,swig,gestorBD) {
                             res.send(respuestaError);
                         } else {
                             if(!suficienteSaldo(ofertas[0],req.session.saldo)){
-                                res.redirect("/oferta/list?mensaje=No tienes suficiente dinero para comprar esta oferta");
+                                res.redirect("/oferta/list?mensaje=No tienes suficiente dinero para comprar esta oferta&tipoMensaje=alert-danger ");
                             }
                             else {
                                 ofertas[0].comprador=req.session.usuario;
@@ -158,7 +158,35 @@ module.exports = function(app,swig,gestorBD) {
                                                     });
                                                 res.send(respuestaError);
                                             } else {
-                                                res.redirect("/oferta/list");
+                                                criterio = { "email" : ofertas[0].vendedor }
+                                                gestorBD.obtenerUsuarios(criterio,function (usuarios) {
+                                                    if (usuarios == null) {
+                                                        let respuestaError = swig.renderFile('views/error.html',
+                                                            {
+                                                                mensajes: "Error al obtener vendedor",
+                                                                usuario: req.session.usuario,
+                                                                rol: req.session.rol,
+                                                                saldo: req.session.saldo
+                                                            });
+                                                        res.send(respuestaError);
+                                                    } else {
+                                                        newSaldo=parseFloat(usuarios[0].saldo)+parseFloat(ofertas[0].precio);
+                                                        gestorBD.actualizaSaldo(criterio,newSaldo,function (idUsuario) {
+                                                            if (idUsuario == null) {
+                                                                let respuestaError = swig.renderFile('views/error.html',
+                                                                    {
+                                                                        mensajes: "Error al procesar el pago",
+                                                                        usuario: req.session.usuario,
+                                                                        rol: req.session.rol,
+                                                                        saldo: req.session.saldo
+                                                                    });
+                                                                res.send(respuestaError);
+                                                            } else {
+                                                                res.redirect("/oferta/list");
+                                                            }
+                                                        });
+                                                    }
+                                                });
                                             }
                                         });
                                     }
@@ -190,6 +218,7 @@ module.exports = function(app,swig,gestorBD) {
                 }
                 let criterio = { "_id" : { $in: ofertasCompradasIds } }
                 gestorBD.obtenerOfertas(criterio,function (ofertas){
+                    console.log(ofertas)
                     let respuesta = swig.renderFile('views/bcompradas.html',
                         {
                             ofertas : ofertas,
@@ -204,7 +233,10 @@ module.exports = function(app,swig,gestorBD) {
     });
 
     app.get("/oferta/destacar/:id", function (req, res){
-        let criterio = { vendedor : req.session.usuario };
+        let criterio = {
+            vendedor : req.session.usuario,
+            comprador :null
+        };
         let respuestaError = swig.renderFile('views/error.html',
             {
                 mensajes: "Error al destacar la oferta",
@@ -220,7 +252,34 @@ module.exports = function(app,swig,gestorBD) {
                     {
                         criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id) };
                         gestorBD.destacaOferta(criterio, true, function (result) {
-                            res.redirect("/oferta/propias");
+                            if(result==null){
+                                let respuestaError = swig.renderFile('views/error.html',
+                                    {
+                                        mensajes: "Error al destacar oferta.",
+                                        usuario : req.session.usuario,
+                                        rol : req.session.rol,
+                                        saldo : req.session.saldo
+                                    });
+                            }else{
+                                let cantidad = req.session.saldo - 20;
+                                req.session.saldo = cantidad;
+                                let criterio = {"email": req.session.usuario};
+                                gestorBD.actualizaSaldo(criterio, cantidad, function (result) {
+                                    if (result == null) {
+                                        let respuesta = swig.renderFile('views/error.html',
+                                            {
+                                                mensajes: "Error al modificar el saldo",
+                                                usuario: req.session.usuario,
+                                                rol: req.session.rol,
+                                                saldo: req.session.saldo
+                                            });
+                                        res.send(respuesta);
+                                    }
+                                    else{
+                                        res.redirect("/oferta/propias");
+                                    }
+                                });
+                            }
                         })
                     }
                 }
@@ -243,16 +302,15 @@ module.exports = function(app,swig,gestorBD) {
                     });
                 res.send(respuestaError);
             } else {
-                    criterio = {"usuario": req.session.usuario};
-                    gestorBD.obtenerCompras(criterio, function (compras) {
-                        let respuesta = swig.renderFile('views/boferta.html',
-                            {
-                                oferta: ofertas[0],
-                                propietario: isVendedorOrComprada(compras, ofertas[0], req.session.usuario)
-                            });
-                        res.send(respuesta);
-                    });
-                //});
+                criterio = {"usuario": req.session.usuario};
+                gestorBD.obtenerCompras(criterio, function (compras) {
+                    let respuesta = swig.renderFile('views/boferta.html',
+                        {
+                            oferta: ofertas[0],
+                            propietario: isVendedorOrComprada(compras, ofertas[0], req.session.usuario)
+                        });
+                    res.send(respuesta);
+                });
             }
         });
     });
@@ -265,7 +323,8 @@ module.exports = function(app,swig,gestorBD) {
             precio : req.body.precio,
             fecha : d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear(),
             vendedor: req.session.usuario,
-            comprador : null
+            comprador : null,
+            destacada : (req.body.destacada=="on")
         }
         let mensaje=validacionAgregarOferta(oferta);
         if(mensaje=="") {
@@ -294,10 +353,11 @@ module.exports = function(app,swig,gestorBD) {
                                         saldo: req.session.saldo
                                     });
                                 res.send(respuesta);
+                            }else{
+                                res.redirect("/oferta/propias");
                             }
                         });
                     }
-                    res.redirect("/oferta/propias");
                 }
             });
         }else{

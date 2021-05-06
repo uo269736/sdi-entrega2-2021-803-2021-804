@@ -138,7 +138,7 @@ module.exports = function(app, swig, gestorBD) {
             nombre : req.body.nombre,
             apellidos : req.body.apellidos,
             rol : "usuario",
-            saldo : 100
+            saldo : parseInt("100")
         }
         let mensaje=validacionRegistro(usuario,req.body.password,req.body.passwordc);
         let criterio ={"email": req.body.email};

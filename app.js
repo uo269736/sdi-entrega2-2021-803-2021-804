@@ -94,6 +94,7 @@ app.use("/oferta/agregar",routerUsuarioSession);
 app.use("/oferta/propias",routerUsuarioSession);
 app.use("/oferta/list",routerUsuarioSession);
 app.use("/oferta/compradas",routerUsuarioSession);
+app.use("/oferta/comprar",routerUsuarioSession);
 app.use("/home",routerUsuarioSession);
 
 
@@ -111,13 +112,14 @@ routerUsuarioVendedor.use(function(req, res, next) {
             if(ofertas[0].vendedor == req.session.usuario ){
                 next();
             } else {
-                res.redirect("/tienda");
+                res.redirect("/oferta/propias");
             }
         })
 });
 
-//Aplicar routerUsuarioAutor
+//Aplicar routerUsuarioVendedor
 app.use("/oferta/eliminar",routerUsuarioVendedor);
+app.use("/oferta/destacar",routerUsuarioVendedor);
 
 //routerUsuarioAdmin
 let routerUsuarioAdmin = express.Router();
@@ -136,7 +138,24 @@ routerUsuarioAdmin.use(function(req, res, next) {
 app.use("/usuario/list",routerUsuarioAdmin);
 app.use("/usuario/eliminar",routerUsuarioAdmin);
 
+//routerUsuarioEstandar
+let routerUsuarioEstandar = express.Router();
+routerUsuarioEstandar.use(function(req, res, next) {
+    console.log("routerUsuarioEstandar");
+    if ( req.session.rol=="usuario" ) {
+        // dejamos correr la petición
+        next();
+    } else {
+        console.log("va a : "+req.session.destino)
+        res.redirect("/home");
+    }
+});
 
+//Aplicar routerAdmin
+app.use("/oferta/agregar",routerUsuarioEstandar);
+app.use("/oferta/propias",routerUsuarioEstandar);
+app.use("/oferta/list",routerUsuarioEstandar);
+app.use("/oferta/compradas",routerUsuarioEstandar);
 
 app.use(express.static('public'));
 
