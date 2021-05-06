@@ -234,7 +234,7 @@ module.exports = function(app,swig,gestorBD) {
             titulo : req.body.nombre,
             descripcion : req.body.descripcion,
             precio : req.body.precio,
-            fecha : d.getDate()+"/"+d.getMonth()+"/"+d.getFullYear(),
+            fecha : d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear(),
             vendedor: req.session.usuario,
             comprador : null
         }
