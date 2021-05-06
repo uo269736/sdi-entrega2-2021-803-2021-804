@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titulo %} Mis ofertas – MyWallapop {% endblock %}
+{% block contenido_principal %}
+<!-- Búsqueda -->
+<h2>Mis Ofertas</h2>
+<table class="table table-hover" id="tableOfertasPropias">
+    <thead>
+    <tr>
+        <th class="col-md-2">Título</th>
+        <th>Descripción</th>
+        <th>Precio (euros)</th>
+        <th class="col-md-1"></th>
+        <th class="col-md-1"></th>
+        <th class="col-md-1"></th>
+    </tr>
+    </thead>
+    <tbody>
+<!-- Inicio del Bloque oferta -->
+    {% for oferta in ofertas %}
+        <tr>
+            <td>{{oferta.titulo}}</td>
+            <td>{{oferta.descripcion}}</td>
+            <td>{{oferta.precio}} €</td>
+            <td><a href="${'/oferta/details/' + oferta.id}">detalles</a></td>
+            <td><a href="${'/oferta/eliminar/' + oferta.id}">eliminar</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<!-- Fin del Bloque oferta -->
+
+{% endblock %}

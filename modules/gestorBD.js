@@ -24,7 +24,7 @@ module.exports = {
                 });
             }
         });
-    },/*
+    },
     obtenerCompras : function(criterio,funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
@@ -41,7 +41,7 @@ module.exports = {
                 });
             }
         });
-    },
+    },/*
     insertarCompra: function(compra, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
