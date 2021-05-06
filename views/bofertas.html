@@ -43,7 +43,7 @@
                 {% else %}
                     <td></td>
                 {% endif %}
-            {% else if oferta.comprador == null %}
+            {% elseif oferta.comprador == null %}
                 <td><a href="/oferta/comprar/{{oferta._id.toString()}}">Comprar</a></td>
             {% else %}
                 <td>Vendido</td>

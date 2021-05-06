@@ -136,16 +136,48 @@ module.exports = function(app, swig, gestorBD) {
             rol : "usuario",
             saldo : "100.00"
         }
-
-        gestorBD.insertarUsuario(usuario, function(id) {
-            if (id == null){
-                res.redirect("/registrarse?mensaje=Error al registrar usuario");
+        let mensaje=validacionRegistro(usuario,req.body.password,req.body.passwordc);
+        let criterio ={"email": req.body.email};
+        gestorBD.obtenerUsuarios(criterio, function(usuarios) {
+            if (usuarios == null || usuarios.length==0) {
+                if(mensaje=="") {
+                    gestorBD.insertarUsuario(usuario, function (id) {
+                        if (id == null) {
+                            res.redirect("/registrarse?mensaje=Error al registrar usuario");
+                        } else {
+                            req.session.rol = usuario.rol;
+                            req.session.usuario = usuario.email;
+                            req.session.saldo = usuario.saldo;
+                            res.redirect("/home?mensaje=Nuevo usuario registrado");
+                        }
+                    });
+                }else{
+                    req.session.usuario = null
+                    res.redirect("/registrarse" +
+                        "?mensaje="+mensaje+"&tipoMensaje=alert-danger ");
+                }
             } else {
-                req.session.rol = usuario.rol;
-                req.session.usuario = usuario.email;
-                req.session.saldo = usuario.saldo;
-                res.redirect("/home?mensaje=Nuevo usuario registrado");
+                req.session.usuario = null
+                res.redirect("/registrarse" +
+                    "?mensaje=Este email ya está en uso<br>"+mensaje+"&tipoMensaje=alert-danger ");
             }
         });
     });
+
+    function validacionRegistro(usuario,password,passwordConfirm) {
+        let mensaje="";
+        if (usuario.nombre.length<5){
+            mensaje+="El nombre debe tener al menos 5 caracteres<br>";
+        }
+        if (usuario.apellidos.length<5){
+            mensaje+="Los apellidos deben tener al menos 5 caracteres<br>";
+        }
+        if (password.length<5){
+            mensaje+="La contraseña debe tener al menos 5 caracteres<br>";
+        }
+        if (password!=passwordConfirm){
+            mensaje+="Las contraseñas deben ser iguales<br>";
+        }
+        return mensaje;
+    };
 };

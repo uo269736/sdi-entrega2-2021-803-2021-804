@@ -239,21 +239,26 @@ module.exports = function(app,swig,gestorBD) {
             vendedor: req.session.usuario,
             comprador : null
         }
-        // Conectarse
-        gestorBD.insertarOferta(oferta, function(id){
-            if (id == null) {
-                let respuestaError = swig.renderFile('views/error.html',
-                    {
-                        mensajes : "Error al insertar oferta",
-                        usuario : req.session.usuario,
-                        rol : req.session.rol,
-                        saldo : req.session.saldo
-                    });
-                res.send(respuestaError);
-            } else {
-                res.redirect("/oferta/propias");
-            }
-        });
+        let mensaje=validacionAgregarOferta(oferta);
+        if(mensaje=="") {
+            gestorBD.insertarOferta(oferta, function (id) {
+                if (id == null) {
+                    let respuestaError = swig.renderFile('views/error.html',
+                        {
+                            mensajes: "Error al insertar oferta",
+                            usuario: req.session.usuario,
+                            rol: req.session.rol,
+                            saldo: req.session.saldo
+                        });
+                    res.send(respuestaError);
+                } else {
+                    res.redirect("/oferta/propias");
+                }
+            });
+        }else{
+            res.redirect("/oferta/agregar" +
+                "?mensaje="+mensaje+"&tipoMensaje=alert-danger ");
+        }
     });
 
     function isVendedorOrComprada(compras, oferta, usuario) {
@@ -275,5 +280,19 @@ module.exports = function(app,swig,gestorBD) {
         } else {
             return true;
         }
+    };
+
+    function validacionAgregarOferta(oferta) {
+        let mensaje="";
+        if (oferta.titulo.length<4){
+            mensaje+="El titulo debe tener al menos 4 caracteres<br>";
+        }
+        if (oferta.descripcion.length<5){
+            mensaje+="La descripción debe tener al menos 5 caracteres<br>";
+        }
+        if (oferta.precio<0){
+            mensaje+="El precio no puede ser negativo<br>";
+        }
+        return mensaje;
     };
 };
