@@ -94,17 +94,12 @@ module.exports = function(app,swig,gestorBD) {
     });
 
     app.get('/oferta/comprar/:id', function (req, res) {
-        let cancionId = gestorBD.mongo.ObjectID(req.params.id);
-        let compra = {
-            usuario: req.session.usuario,
-            cancionId: cancionId
-        }
-        let criterioCancion = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
-        gestorBD.obtenerCanciones(criterioCancion, function (canciones) {
-            if (canciones == null) {
+        let criterioOferta = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
+        gestorBD.obtenerOfertas(criterioOferta, function (ofertas) {
+            if (ofertas == null) {
                 let respuestaError = swig.renderFile('views/error.html',
                     {
-                        mensajes : "Error al recuperar la canción",
+                        mensajes : "Error al recuperar la oferta",
                         usuario : req.session.usuario,
                         rol : req.session.rol,
                         saldo : req.session.saldo
@@ -123,7 +118,7 @@ module.exports = function(app,swig,gestorBD) {
                             });
                         res.send(respuestaError);
                     } else {
-                        if (isVendedorOrComprada(compras, canciones[0], req.session.usuario)) {
+                        if (isVendedorOrComprada(compras, ofertas[0], req.session.usuario)) {
                             let respuestaError = swig.renderFile('views/error.html',
                                 {
                                     mensajes : "No puedes comprar si eres el autor o ya la tienes comprada",
@@ -133,18 +128,45 @@ module.exports = function(app,swig,gestorBD) {
                                 });
                             res.send(respuestaError);
                         } else {
-                            gestorBD.insertarCompra(compra, function (idCompra) {
-                                if (idCompra == null) {
-                                    res.send(respuesta);
-                                } else {
-                                    res.redirect("/compras");
-                                }
-                            });
+                            if(!suficienteSaldo(ofertas[0],req.session.saldo)){
+                                res.redirect("/oferta/list?mensaje=No tienes suficiente dinero para comprar esta oferta");
+                            }
+                            else {
+                                oferta[0].comprador=req.session.usuario;
+                                gestorBD.comprarOferta(criterioOferta,ofertas[0], function (idCompra) {
+                                    if (idCompra == null) {
+                                        let respuestaError = swig.renderFile('views/error.html',
+                                            {
+                                                mensajes : "Error al comprar la oferta",
+                                                usuario : req.session.usuario,
+                                                rol : req.session.rol,
+                                                saldo : req.session.saldo
+                                            });
+                                        res.send(respuestaError);
+                                    } else {
+                                        let newSaldo=req.session.saldo-ofertas[0].precio;
+                                        req.session.saldo=newSaldo;
+                                        gestorBD.actualizaSaldo(req.session.usuario,newSaldo,function (idUsuario){
+                                            if(idUsuario==null){
+                                                let respuestaError = swig.renderFile('views/error.html',
+                                                    {
+                                                        mensajes : "Error al procesar el pago",
+                                                        usuario : req.session.usuario,
+                                                        rol : req.session.rol,
+                                                        saldo : req.session.saldo
+                                                    });
+                                                res.send(respuestaError);
+                                            } else {
+                                                res.redirect("/oferta/list");
+                                            }
+                                        });
+                                    }
+                                });
+                            }
                         }
                     }
                 });
-            }
-            ;
+            };
         });
     });
 
@@ -193,21 +215,6 @@ module.exports = function(app,swig,gestorBD) {
                     });
                 res.send(respuestaError);
             } else {
-                /*let configuracion = {
-                    url: "https://www.freeforexapi.com/api/live?pairs=EURUSD",
-                    method: "get",
-                    headers: {
-                        "token": "ejemplo",
-                    }
-                }
-                let rest = app.get("rest");
-                rest(configuracion, function (error, response, body) {
-                    console.log("cod: " + response.statusCode + " Cuerpo :" + body);
-                    let objetoRespuesta = JSON.parse(body);
-                    let cambioUSD = objetoRespuesta.rates.EURUSD.rate;
-                     nuevo campo "usd"
-                    ofertas[0].usd = cambioUSD * ofertas[0].precio;*/
-
                     criterio = {"usuario": req.session.usuario};
                     gestorBD.obtenerCompras(criterio, function (compras) {
                         let respuesta = swig.renderFile('views/boferta.html',
@@ -259,6 +266,14 @@ module.exports = function(app,swig,gestorBD) {
                 }
             }
             return false;
+        }
+    };
+
+    function suficienteSaldo(oferta, saldo) {
+        if (oferta.precio > saldo){
+            return false;
+        } else {
+            return true;
         }
     };
 };
