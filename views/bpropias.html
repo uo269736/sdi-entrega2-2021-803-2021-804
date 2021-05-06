@@ -27,7 +27,19 @@
             {% else %}
                 <td>Vendido</td>
             {% endif %}
-
+            {% if !oferta.destacada %}
+                <td>
+                    <div>
+                        <a href="/oferta/destacar/{{oferta._id.toString()}}">
+                            <button class="btn btn-primary">Destacar</button>
+                        </a>
+                    </div>
+                </td>
+            {% else %}
+                <td>
+                    <div align="center">Destacada</div>
+                </td>
+            {% endif %}
         </tr>
     {% endfor %}
     </tbody>

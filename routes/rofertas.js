@@ -132,7 +132,7 @@ module.exports = function(app,swig,gestorBD) {
                                 res.redirect("/oferta/list?mensaje=No tienes suficiente dinero para comprar esta oferta");
                             }
                             else {
-                                oferta[0].comprador=req.session.usuario;
+                                ofertas[0].comprador=req.session.usuario;
                                 gestorBD.comprarOferta(criterioOferta,ofertas[0], function (idCompra) {
                                     if (idCompra == null) {
                                         let respuestaError = swig.renderFile('views/error.html',
@@ -146,7 +146,8 @@ module.exports = function(app,swig,gestorBD) {
                                     } else {
                                         let newSaldo=req.session.saldo-ofertas[0].precio;
                                         req.session.saldo=newSaldo;
-                                        gestorBD.actualizaSaldo(req.session.usuario,newSaldo,function (idUsuario){
+                                        let criterio = { "email" : req.session.usuario }
+                                        gestorBD.actualizaSaldo(criterio,newSaldo,function (idUsuario){
                                             if(idUsuario==null){
                                                 let respuestaError = swig.renderFile('views/error.html',
                                                     {
@@ -202,6 +203,33 @@ module.exports = function(app,swig,gestorBD) {
         });
     });
 
+    app.get("/oferta/destacar/:id", function (req, res){
+        let criterio = { vendedor : req.session.usuario };
+        let respuestaError = swig.renderFile('views/error.html',
+            {
+                mensajes: "Error al destacar la oferta",
+                usuario: req.session.usuario,
+                rol: req.session.rol,
+                saldo: req.session.saldo
+            });
+        if(req.session.saldo >= 20) {
+            gestorBD.obtenerOfertas(criterio, function (ofertas) {
+                if (ofertas == null) {
+                    res.send(respuestaError);
+                } else {
+                    {
+                        criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id) };
+                        gestorBD.destacaOferta(criterio, true, function (result) {
+                            res.redirect("/oferta/propias");
+                        })
+                    }
+                }
+            });
+        } else{
+            res.send(respuestaError);
+        }
+    });
+
     app.get('/oferta/:id', function(req, res) {
         let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
         gestorBD.obtenerOfertas(criterio, function (ofertas) {
@@ -238,9 +266,8 @@ module.exports = function(app,swig,gestorBD) {
             fecha : d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear(),
             vendedor: req.session.usuario,
             comprador : null,
-            destacada : req.body.destacada
+            destacada : (req.body.destacada=="on")
         }
-        console.log("destacada "+ req.body.destacada);
         gestorBD.insertarOferta(oferta, function(id){
             if (id == null) {
                 let respuestaError = swig.renderFile('views/error.html',
@@ -252,20 +279,20 @@ module.exports = function(app,swig,gestorBD) {
                     });
                 res.send(respuestaError);
             } else {
-                let cantidad = req.session.saldo-20;
-                req.session.saldo = cantidad;
-                console.log("cantidad "+ cantidad);
-                let criterio = { "email" : req.session.usuario };
-                console.log(req.session.email);
-                gestorBD.actualizaSaldo(criterio, cantidad, function(result) {
-                    if (result == null) {
-                        let respuesta = swig.renderFile('views/error.html',
-                            {
-                                texto : "Error al modificar"
-                            });
-                        res.send(respuesta);
-                    }
-                });
+                if(req.body.destacada=="on") {
+                    let cantidad = req.session.saldo - 20;
+                    req.session.saldo = cantidad;
+                    let criterio = {"email": req.session.usuario};
+                    gestorBD.actualizaSaldo(criterio, cantidad, function (result) {
+                        if (result == null) {
+                            let respuesta = swig.renderFile('views/error.html',
+                                {
+                                    texto: "Error al modificar"
+                                });
+                            res.send(respuesta);
+                        }
+                    });
+                }
                 res.redirect("/oferta/propias");
             }
         });

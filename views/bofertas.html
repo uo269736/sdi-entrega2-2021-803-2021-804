@@ -26,7 +26,6 @@
         <th>Precio (euros)</th>
         <th class="col-md-1"></th>
         <th class="col-md-1"></th>
-        <th class="col-md-1"></th>
     </tr>
     </thead>
     <tbody>
@@ -43,8 +42,12 @@
                 {% else %}
                     <td></td>
                 {% endif %}
-            {% else if oferta.comprador == null %}
-                <td><a href="/oferta/comprar/{{oferta._id.toString()}}">Comprar</a></td>
+            {% elseif oferta.comprador == null %}
+                <td>
+                    <a href="/oferta/comprar/{{oferta._id.toString()}}">
+                        <button class="btn btn-primary">Comprar</button>
+                    </a>
+                </td>
             {% else %}
                 <td>Vendido</td>
             {% endif %}

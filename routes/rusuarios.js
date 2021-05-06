@@ -90,12 +90,16 @@ module.exports = function(app, swig, gestorBD) {
     });
 
     app.get("/home", function(req, res) {
-        let respuesta = swig.renderFile('views/home.html', {
-            usuario : req.session.usuario,
-            rol : req.session.rol,
-            saldo : req.session.saldo
+        let criterio = { "destacada" : true };
+        gestorBD.obtenerOfertas(criterio, function (ofertas) {
+            let respuesta = swig.renderFile('views/home.html', {
+                usuario : req.session.usuario,
+                rol : req.session.rol,
+                saldo : req.session.saldo,
+                ofertas : ofertas
+            });
+            res.send(respuesta);
         });
-        res.send(respuesta);
     });
 
     app.post("/identificarse", function(req, res) {

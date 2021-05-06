@@ -11,10 +11,46 @@
 			Usuario Autenticado como:</span>
         <span>{{ usuario }}</span>
     </p>
-    <!--
-    <div class="table-responsive" sec:authorize="hasRole('ROLE_USUARIO')">
-        <table th:replace="fragments/tableOfertas" th:fragment="tableOfertas" id="tableOfertas"/>
-    </div>
-    -->
+    <sec></sec><sec></sec>
+    <h2>Ofertas destacadas</h2>
+    <table class="table table-hover" id="tableOfertas">
+        <thead>
+            <tr>
+                <th class="col-md-2">Titulo</th>
+                <th>Descripción</th>
+                <th>Precio (euros)</th>
+                <th class="col-md-1"></th>
+                <th class="col-md-1"></th>
+            </tr>
+        </thead>
+            <tbody>
+                {% if ofertas != null %}
+                    <!-- Inicio del Bloque oferta -->
+                    {% for oferta in ofertas %}
+                        <tr>
+                            <td>{{oferta.titulo}}</td>
+                            <td>{{oferta.descripcion}}</td>
+                            <td>{{oferta.precio}} €</td>
+                            <td><a href="/oferta/{{ oferta._id.toString() }}">detalles</a></td>
+                            {% if oferta.vendedor == usuario %}
+                                {% if oferta.comprador != null %}
+                                <td>Vendido</td>
+                                {% else %}
+                                <td></td>
+                                {% endif %}
+                            {% elseif oferta.comprador == null %}
+                                <td>
+                                    <a href="/oferta/comprar/{{oferta._id.toString()}}">
+                                        <button class="btn btn-primary">Comprar</button>
+                                    </a>
+                                </td>
+                            {% else %}
+                                <td>Vendido</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
 </div>
 {% endblock %}
