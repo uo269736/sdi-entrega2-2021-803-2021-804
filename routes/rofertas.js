@@ -265,37 +265,45 @@ module.exports = function(app,swig,gestorBD) {
             precio : req.body.precio,
             fecha : d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear(),
             vendedor: req.session.usuario,
-            comprador : null,
-            destacada : (req.body.destacada=="on")
+            comprador : null
         }
-        gestorBD.insertarOferta(oferta, function(id){
-            if (id == null) {
-                let respuestaError = swig.renderFile('views/error.html',
-                    {
-                        mensajes : "Error al insertar oferta",
-                        usuario : req.session.usuario,
-                        rol : req.session.rol,
-                        saldo : req.session.saldo
-                    });
-                res.send(respuestaError);
-            } else {
-                if(req.body.destacada=="on") {
-                    let cantidad = req.session.saldo - 20;
-                    req.session.saldo = cantidad;
-                    let criterio = {"email": req.session.usuario};
-                    gestorBD.actualizaSaldo(criterio, cantidad, function (result) {
-                        if (result == null) {
-                            let respuesta = swig.renderFile('views/error.html',
-                                {
-                                    texto: "Error al modificar"
-                                });
-                            res.send(respuesta);
-                        }
-                    });
+        let mensaje=validacionAgregarOferta(oferta);
+        if(mensaje=="") {
+            gestorBD.insertarOferta(oferta, function(id){
+                if (id == null) {
+                    let respuestaError = swig.renderFile('views/error.html',
+                        {
+                            mensajes : "Error al insertar oferta",
+                            usuario : req.session.usuario,
+                            rol : req.session.rol,
+                            saldo : req.session.saldo
+                        });
+                    res.send(respuestaError);
+                } else {
+                    if(req.body.destacada=="on") {
+                        let cantidad = req.session.saldo - 20;
+                        req.session.saldo = cantidad;
+                        let criterio = {"email": req.session.usuario};
+                        gestorBD.actualizaSaldo(criterio, cantidad, function (result) {
+                            if (result == null) {
+                                let respuesta = swig.renderFile('views/error.html',
+                                    {
+                                        mensajes: "Error al modificar el saldo",
+                                        usuario: req.session.usuario,
+                                        rol: req.session.rol,
+                                        saldo: req.session.saldo
+                                    });
+                                res.send(respuesta);
+                            }
+                        });
+                    }
+                    res.redirect("/oferta/propias");
                 }
-                res.redirect("/oferta/propias");
-            }
-        });
+            });
+        }else{
+            res.redirect("/oferta/agregar" +
+                "?mensaje="+mensaje+"&tipoMensaje=alert-danger ");
+        }
     });
 
     function isVendedorOrComprada(compras, oferta, usuario) {
@@ -317,5 +325,19 @@ module.exports = function(app,swig,gestorBD) {
         } else {
             return true;
         }
+    };
+
+    function validacionAgregarOferta(oferta) {
+        let mensaje="";
+        if (oferta.titulo.length<4){
+            mensaje+="El titulo debe tener al menos 4 caracteres<br>";
+        }
+        if (oferta.descripcion.length<5){
+            mensaje+="La descripción debe tener al menos 5 caracteres<br>";
+        }
+        if (oferta.precio<0){
+            mensaje+="El precio no puede ser negativo<br>";
+        }
+        return mensaje;
     };
 };
