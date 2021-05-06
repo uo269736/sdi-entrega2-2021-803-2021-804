@@ -21,8 +21,8 @@
             <td>{{oferta.titulo}}</td>
             <td>{{oferta.descripcion}}</td>
             <td>{{oferta.precio}} €</td>
-            <td><a href="${'/oferta/details/' + oferta.id}">detalles</a></td>
-            <td><a href="${'/oferta/eliminar/' + oferta.id}">eliminar</a></td>
+            <td><a href="/oferta/{{oferta._id.toString()}}">detalles</a></td>
+            <td><a href="/oferta/eliminar/{{oferta._id.toString()}}">eliminar</a></td>
         </tr>
     {% endfor %}
     </tbody>
