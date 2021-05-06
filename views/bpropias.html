@@ -21,8 +21,13 @@
             <td>{{oferta.titulo}}</td>
             <td>{{oferta.descripcion}}</td>
             <td>{{oferta.precio}} €</td>
-            <td><a href="/oferta/{{oferta._id.toString()}}">detalles</a></td>
-            <td><a href="/oferta/eliminar/{{oferta._id.toString()}}">eliminar</a></td>
+            <td><a href="/oferta/details/{{oferta._id.toString()}}">detalles</a></td>
+            {% if oferta.comprador == null %}
+                <td><a href="/oferta/eliminar/{{oferta._id.toString()}}">eliminar</a></td>
+            {% else %}
+                <td>Vendido</td>
+            {% endif %}
+
         </tr>
     {% endfor %}
     </tbody>

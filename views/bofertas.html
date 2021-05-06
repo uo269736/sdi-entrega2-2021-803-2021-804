@@ -37,34 +37,18 @@
             <td>{{oferta.descripcion}}</td>
             <td>{{oferta.precio}} €</td>
             <td><a href="/oferta/{{ oferta._id.toString() }}">detalles</a></td>
-            <!--
-            <td>
-                <div th:if="${!oferta.comprada}">
-                    <div th:if="${!(oferta.user.id==session.usuario.id)}">
-                        <button type="button" th:id="${'buyButton' + oferta.id}" class="btn btn-info" th:text="#{oferta.comprar}">Comprar</button>
-                        <script th:inline="javascript">
-                            /*<![CDATA[*/
-                            $( "#buyButton[[${oferta.id}]]" ).click(function() {
-                                $.get( "/oferta/[[${oferta.id}]]/comprar", function( data ) {
-                                    var numberPage = [[${param.page}]];
-                                    var urlUpdate = '/oferta/list';
-                                    if ( numberPage != null ){
-                                        urlUpdate += "?page="+numberPage[0];
-                                    }
-                                    $("#lista").load(urlUpdate);
-                                    location.reload();
-                                    if([[${oferta.cantidad}]] > [[${session.usuario.saldo}]]){
-                                        alert("Error al realizar la compra, saldo insuficiente.");
-                                    }
-                                });
-                            });
-                            /*]]>*/
-                        </script>
-                    </div>
-                </div>
-            </td>
-            <td th:if="${oferta.comprada}" th:text="#{oferta.vendida}"></td>
-            -->
+            {% if oferta.vendedor == usuario %}
+                {% if oferta.comprador != null %}
+                    <td>Vendido</td>
+                {% else %}
+                    <td></td>
+                {% endif %}
+            {% else if oferta.comprador == null %}
+                <td><a href="/oferta/comprar/{{oferta._id.toString()}}">Comprar</a></td>
+            {% else %}
+                <td>Vendido</td>
+            {% endif %}
+
         </tr>
     {% endfor %}
     </tbody>
