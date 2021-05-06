@@ -13,11 +13,11 @@ module.exports = function(app,swig,gestorBD) {
 
     app.get('/oferta/eliminar/:id', function (req, res) {
         let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
-        gestorBD.eliminarCancion(criterio,function(canciones){
-            if ( canciones == null ){
+        gestorBD.eliminarOferta(criterio,function(ofertas){
+            if ( ofertas == null ){
                 res.send(respuesta);
             } else {
-                res.redirect("/publicaciones");
+                res.redirect("/oferta/propias");
             }
         });
     });
@@ -149,8 +149,7 @@ module.exports = function(app,swig,gestorBD) {
     });
 
     app.get('/oferta/compradas', function (req, res) {
-        let criterio = { "usuario" : req.session.usuario };
-
+        let criterio = { comprador : req.session.usuario };
         gestorBD.obtenerCompras(criterio ,function(compras){
             if ( compras == null ){
                 let respuestaError = swig.renderFile('views/error.html',
@@ -162,15 +161,15 @@ module.exports = function(app,swig,gestorBD) {
                     });
                 res.send(respuestaError);
             } else {
-                let cancionesCompradasIds = [];
+                let ofertasCompradasIds = [];
                 for(i=0; i<compras.length; i++){
-                    cancionesCompradasIds.push( compras[i].cancionId );
+                    ofertasCompradasIds.push( compras[i]._id );
                 }
-                let criterio = { "_id" : { $in: cancionesCompradasIds } }
-                gestorBD.obtenerCanciones(criterio,function (canciones){
-                    let respuesta = swig.renderFile('views/bcompras.html',
+                let criterio = { "_id" : { $in: ofertasCompradasIds } }
+                gestorBD.obtenerOfertas(criterio,function (ofertas){
+                    let respuesta = swig.renderFile('views/bcompradas.html',
                         {
-                            canciones : canciones,
+                            ofertas : ofertas,
                             usuario : req.session.usuario,
                             rol : req.session.rol,
                             saldo : req.session.saldo
@@ -224,10 +223,12 @@ module.exports = function(app,swig,gestorBD) {
     });
 
     app.post("/oferta", function (req, res){
+        let d=new Date();
         let oferta = {
             titulo : req.body.nombre,
             descripcion : req.body.descripcion,
             precio : req.body.precio,
+            fecha : d.getDate()+"/"+d.getMonth()+"/"+d.getFullYear(),
             vendedor: req.session.usuario,
             comprador : null
         }
@@ -243,7 +244,7 @@ module.exports = function(app,swig,gestorBD) {
                     });
                 res.send(respuestaError);
             } else {
-                res.redirect("/oferta/list");
+                res.redirect("/oferta/propias");
             }
         });
     });
