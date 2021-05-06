@@ -134,7 +134,7 @@ module.exports = function(app, swig, gestorBD) {
             nombre : req.body.nombre,
             apellidos : req.body.apellidos,
             rol : "usuario",
-            saldo : "100.00"
+            saldo : 100
         }
 
         gestorBD.insertarUsuario(usuario, function(id) {

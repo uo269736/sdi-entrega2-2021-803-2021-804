@@ -230,9 +230,10 @@ module.exports = function(app,swig,gestorBD) {
             precio : req.body.precio,
             fecha : d.getDate()+"/"+d.getMonth()+"/"+d.getFullYear(),
             vendedor: req.session.usuario,
-            comprador : null
+            comprador : null,
+            destacada : req.body.destacada
         }
-        // Conectarse
+        console.log("destacada "+ req.body.destacada);
         gestorBD.insertarOferta(oferta, function(id){
             if (id == null) {
                 let respuestaError = swig.renderFile('views/error.html',
@@ -244,6 +245,20 @@ module.exports = function(app,swig,gestorBD) {
                     });
                 res.send(respuestaError);
             } else {
+                let cantidad = req.session.saldo-20;
+                req.session.saldo = cantidad;
+                console.log("cantidad "+ cantidad);
+                let criterio = { "email" : req.session.usuario };
+                console.log(req.session.email);
+                gestorBD.actualizaSaldo(criterio, cantidad, function(result) {
+                    if (result == null) {
+                        let respuesta = swig.renderFile('views/error.html',
+                            {
+                                texto : "Error al modificar"
+                            });
+                        res.send(respuesta);
+                    }
+                });
                 res.redirect("/oferta/propias");
             }
         });
