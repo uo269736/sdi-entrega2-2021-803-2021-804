@@ -1,0 +1,24 @@
+{% extends "base.html" %} 
+
+{% block titulo %} Detalles {{ oferta.titulo }} {% endblock %}
+
+{% block contenido_principal %}
+	 <div class="row">
+		<div class="media col-xs-10">
+			<!--
+		  <div class="media-left media-middle">
+			<img class="media-object" src="/portadas/{{ cancion._id.toString() }}.png" >
+		  </div>
+		  -->
+		  <div class="media-body">
+			 <h2>{{ oferta.titulo }}</h2>
+			 <p>{{ oferta.descripcion }}</p>
+			 <p>Vendedor: {{ oferta.vendedor }}</p>
+			  {% if !propietario %}
+				  <a class="btn btn-primary pull-right"
+					 href="/oferta/comprar/{{oferta._id.toString()}}">{{ oferta.precio }} € <!-- - {{ oferta.usd }} $--></a>
+			  {% endif %}
+		  </div>
+		</div>
+	  </div>
+{% endblock %}

@@ -193,37 +193,31 @@ module.exports = function(app,swig,gestorBD) {
                     });
                 res.send(respuestaError);
             } else {
-                let criterioCompra = {"usuario": req.session.usuario};
-                gestorBD.obtenerCompras(criterioCompra, function (compras) {
-                    if (compras == null) {
-                        res.send("Error al listar");
-                    } else {
-                        let booleanAutorComprada = isVendedorOrComprada(compras, ofertas[0], req.session.usuario);
-                        resComentarios = comentarios;
-                        let configuracion = {
-                            url: "https://www.freeforexapi.com/api/live?pairs=EURUSD",
-                            method: "get",
-                            headers: {
-                                "token": "ejemplo",
-                            }
-                        }
-                        let rest = app.get("rest");
-                        rest(configuracion, function (error, response, body) {
-                            console.log("cod: " + response.statusCode + " Cuerpo :" + body);
-                            let objetoRespuesta = JSON.parse(body);
-                            let cambioUSD = objetoRespuesta.rates.EURUSD.rate;
-                            // nuevo campo "usd"
-                            ofertas[0].usd = cambioUSD * ofertas[0].precio;
-                            let respuesta = swig.renderFile('views/bcancion.html',
-                                {
-                                    cancion: ofertas[0],
-                                    comentarios: resComentarios,
-                                    isAutorComprada: booleanAutorComprada
-                                });
-                            res.send(respuesta);
-                        });
+                /*let configuracion = {
+                    url: "https://www.freeforexapi.com/api/live?pairs=EURUSD",
+                    method: "get",
+                    headers: {
+                        "token": "ejemplo",
                     }
-                });
+                }
+                let rest = app.get("rest");
+                rest(configuracion, function (error, response, body) {
+                    console.log("cod: " + response.statusCode + " Cuerpo :" + body);
+                    let objetoRespuesta = JSON.parse(body);
+                    let cambioUSD = objetoRespuesta.rates.EURUSD.rate;
+                     nuevo campo "usd"
+                    ofertas[0].usd = cambioUSD * ofertas[0].precio;*/
+
+                    criterio = {"usuario": req.session.usuario};
+                    gestorBD.obtenerCompras(criterio, function (compras) {
+                        let respuesta = swig.renderFile('views/boferta.html',
+                            {
+                                oferta: ofertas[0],
+                                propietario: isVendedorOrComprada(compras, ofertas[0], req.session.usuario)
+                            });
+                        res.send(respuesta);
+                    });
+                //});
             }
         });
     });
@@ -256,18 +250,15 @@ module.exports = function(app,swig,gestorBD) {
     });
 
     function isVendedorOrComprada(compras, oferta, usuario) {
-        if (cancion.autor == usuario) {
+        if ((oferta.vendedor) == usuario) {
             return true;
         } else {
             for (let i = 0; i < compras.length; i++) {
-                if ((compras[i].ofertaId).equals(oferta._id)) {
+                if ((compras[i]._id).equals(oferta._id)) {
                     return true;
                 }
             }
             return false;
         }
     };
-
-
-
 };
