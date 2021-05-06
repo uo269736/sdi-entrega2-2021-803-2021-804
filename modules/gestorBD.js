@@ -24,7 +24,7 @@ module.exports = {
                 });
             }
         });
-    },/*
+    },
     obtenerCompras : function(criterio,funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
@@ -41,7 +41,7 @@ module.exports = {
                 });
             }
         });
-    },
+    },/*
     insertarCompra: function(compra, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
@@ -211,13 +211,13 @@ module.exports = {
                 });
             }
         });
-    },
-    eliminarCancion : function(criterio, funcionCallback) {
+    }*/,
+    eliminarOferta : function(criterio, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
                 funcionCallback(null);
             } else {
-                let collection = db.collection('canciones');
+                let collection = db.collection('ofertas');
                 collection.remove(criterio, function(err, result) {
                     if (err) {
                         funcionCallback(null);
@@ -228,5 +228,5 @@ module.exports = {
                 });
             }
         });
-    }*/
+    }
 };

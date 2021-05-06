@@ -24,10 +24,6 @@ module.exports = function(app, swig, gestorBD) {
         });
     });
 
-
-    //COMPROBAR QUE SE ELIMINEN LAS OFERTAS Y DEMAS//COMPROBAR QUE SE ELIMINEN LAS OFERTAS Y DEMAS//COMPROBAR QUE SE ELIMINEN LAS OFERTAS Y DEMAS//COMPROBAR QUE SE ELIMINEN LAS OFERTAS Y DEMAS
-    //COMPROBAR QUE SE ELIMINEN LAS OFERTAS Y DEMAS//COMPROBAR QUE SE ELIMINEN LAS OFERTAS Y DEMAS//COMPROBAR QUE SE ELIMINEN LAS OFERTAS Y DEMAS//COMPROBAR QUE SE ELIMINEN LAS OFERTAS Y DEMAS
-    //COMPROBAR QUE SE ELIMINEN LAS OFERTAS Y DEMAS//COMPROBAR QUE SE ELIMINEN LAS OFERTAS Y DEMAS//COMPROBAR QUE SE ELIMINEN LAS OFERTAS Y DEMAS//COMPROBAR QUE SE ELIMINEN LAS OFERTAS Y DEMAS
     app.post('/usuario/eliminar', function(req, res) {
         let usuariosIds =req.body.idChecked;
         let array=Array.isArray(req.body.idChecked);
@@ -35,30 +31,47 @@ module.exports = function(app, swig, gestorBD) {
         if (usuariosIds!=undefined){
             for (let i = 0; i < usuariosIds.length; i++){
                 let criterio = {"email": usuariosIds[i]};
+                let criterioOfertas =
+                {
+                    "vendedor": usuariosIds[i],
+                    "comprador": null
+                };
+
                 if(!array){
-                    criterio={"email": usuariosIds}
+                    criterio={"email": usuariosIds};
+                    criterioOfertas={
+                        "vendedor": usuariosIds,
+                        "comprador": null
+                    };
                 }
                 gestorBD.eliminarUsuario(criterio, function (id) {
                     if (id == null) {
                         error=true;
+                    } else{
+                        gestorBD.obtenerOfertas(criterioOfertas, function(ofertas){
+                            for (i = 0; i < ofertas.length; i++) {
+                                let criterioBorrado = {"_id" : ofertas[i]._id }
+                                gestorBD.eliminarOferta(criterioBorrado, function(ofertas){});
+                            }
+                        });
                     }
                 });
                 if(!array){
                     break;
                 }
             }
-            if(error==true){
-                let respuestaError = swig.renderFile('views/error.html',
-                    {
-                        mensajes: "Error al eliminar",
-                        usuario: req.session.usuario,
-                        rol: req.session.rol,
-                        saldo : req.session.saldo
-                    });
-                res.send(respuestaError);
-            }else{
-                res.redirect("/usuario/list?mensaje=Usuario/s eliminado/s correctamente");
-            }
+        }
+        if(error==true){
+            let respuestaError = swig.renderFile('views/error.html',
+                {
+                    mensajes: "Error al eliminar",
+                    usuario: req.session.usuario,
+                    rol: req.session.rol,
+                    saldo : req.session.saldo
+                });
+            res.send(respuestaError);
+        }else{
+            res.redirect("/usuario/list?mensaje=Usuario/s eliminado/s correctamente");
         }
     });
 
