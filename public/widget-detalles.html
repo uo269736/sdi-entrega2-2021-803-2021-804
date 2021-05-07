@@ -27,7 +27,7 @@
                    placeholder="Vendedor de la oferta" id="detalles-vendedor" readonly/>
         </div>
     </div>
-    <a align="right"><button class="btn btn-default pull-right">Habla con el vendedor</button></a>
+    <a align="right"><button onclick="muestraChat()" class="btn btn-default pull-right">Habla con el vendedor</button></a>
     <button onclick="widgetOfertas()" class="btn btn-default" >Volver</button>
 </div>
 
@@ -47,7 +47,13 @@
             $("#detalles-vendedor").val(oferta.vendedor);
         },
         error : function(error) {
-            $( "#contenedor-principal" ).load("widget-login.html");
+            $( "#contenedor-principal" ).load("widget-ofertas.html");
         }
     });
+
+    function muestraChat(){
+        vendedorEmail = $("#detalles-vendedor").val();
+        interesadoEmail = emailUsuario;
+        $( "#contenedor-principal" ).load( "widget-chat.html");
+    }
 </script>

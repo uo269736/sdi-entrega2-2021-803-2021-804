@@ -20,6 +20,7 @@
     </div>
 </div>
 <script>
+    emailUsuario="";
     window.history.pushState("", "", "/cliente.html?w=login");
     $("#boton-login").click(function (){
         $.ajax({
@@ -33,6 +34,7 @@
             success: function(respuesta){
                 console.log(respuesta.token); // <- Prueba
                 token = respuesta.token;
+                emailUsuario=$("#email").val();
                 Cookies.set('token', respuesta.token);
                 $( "#contenedor-principal").load("widget-ofertas.html");
             },

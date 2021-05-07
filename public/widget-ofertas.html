@@ -50,7 +50,7 @@
                 "<a onclick=detalles('"+ofertasMostrar[i]._id+"')>Detalles</a><br>"+
                 "</td>"+
                 "<td>"+
-                "<button class=\"btn btn-default\" onclick=muestraChat()>Habla con el vendedor</button><br>"+
+                "<button class=\"btn btn-default\" onclick=muestraChat('"+ofertasMostrar[i]._id+"','"+ofertasMostrar[i].vendedor+"')>Habla con el vendedor</button><br>"+
                 "</td>"+
                 "</tr>" );
         }
@@ -110,7 +110,10 @@
         tituloDsc = !tituloDsc; //invertir
     }
 
-    function muestraChat(){
-
+    function muestraChat(_id,vendedor){
+        idOfertaSeleccionada = _id;
+        vendedorEmail = vendedor;
+        interesadoEmail = emailUsuario;
+        $( "#contenedor-principal" ).load( "widget-chat.html");
     }
 </script>

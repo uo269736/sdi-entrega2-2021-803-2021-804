@@ -27,7 +27,6 @@ module.exports = function(app, gestorBD) {
                 })
             }
         });
-
     });
 
     app.get("/api/oferta", function(req, res) {
@@ -56,6 +55,44 @@ module.exports = function(app, gestorBD) {
             } else {
                 res.status(200);
                 res.send( JSON.stringify(ofertas[0]) );
+            }
+        });
+    });
+
+    app.get("/api/chat/:idOferta/:emailVendedor/:emailInteresado", function(req, res) {
+        let criterio ={"idOferta" : gestorBD.mongo.ObjectID(req.params.idOferta),"emailVendedor":req.params.emailVendedor,"emailInteresado": req.params.emailInteresado}
+        gestorBD.obtenerMensajes(criterio , function(mensajes) {
+            if (mensajes == null) {
+                res.status(500);
+                res.json({
+                    error : "se ha producido un error"
+                })
+            } else {
+                res.status(200);
+                res.send( JSON.stringify(mensajes) );
+            }
+        });
+    });
+
+    app.post("/api/chat/enviarMensaje", function(req, res) {
+        let mensaje = {
+            idOferta : req.body.idOferta,
+            emailVendedor : req.body.vendedor,
+            emailInteresado : req.body.interesado,
+            escritor : req.session.usuario,
+            fecha : Date.now()/1000,
+            leido : false,
+            texto :req.body.mensaje
+        }
+        gestorBD.insertarMensaje(mensaje, function(mensajes){
+            if (mensajes == null) {
+                res.status(401);    // Usuario no autorizado
+                res.json({
+                    error : "se ha producido un error"
+                })
+            } else {
+                res.status(200);
+                res.json(JSON.stringify(mensaje))
             }
         });
     });

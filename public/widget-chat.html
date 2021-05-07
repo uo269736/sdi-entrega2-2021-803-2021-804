@@ -1,0 +1,73 @@
+<div id="widget-chat" >
+
+    <div id="chat">
+
+    </div>
+    <input type="text" class="form-control" placeholder="Escribe aqui tu mensaje"
+           id="escribir-mensaje"/>
+    <button class="btn" id="boton-enviarMensaje">Enviar</button>
+
+</div>
+<script>
+    window.history.pushState("", "", "/cliente.html?w=chat");
+    var mensajes;
+    function cargarChat(){
+        $.ajax({
+            url: URLbase + "/chat/"+idOfertaSeleccionada+"/"+vendedorEmail+"/"+interesadoEmail,
+            type: "GET",
+            data: { },
+            dataType: 'json',
+            headers: { "token": token },
+            success: function(respuesta) {
+                mensajes = respuesta;
+                actualizarChat(mensajes);
+            },
+            error : function (error){
+                $( "#contenedor-principal" ).load("widget-ofertas.html");
+            }
+        });
+    }
+
+
+    function actualizarChat(mensajes){
+        $( "#chat" ).empty(); // Vaciar la tabla
+        for (i = 0; i < mensajes.length; i++) {
+            if(mensajes[i].escritor==emailUsuario)
+                $( "#chat" ).append(
+                    "<div id="+mensajes[i]._id+">"+
+                    "<p align='right'>("+mensajes[i].fecha+")</p>"+
+                    "<p align='right'>"+mensajes[i].texto+"</p>"+
+                    "</div>" );
+            else
+                $( "#chat" ).append(
+                    "<div id="+mensajes[i]._id+">"+
+                    "<p align='left'>("+mensajes[i].fecha+")</p>"+
+                    "<p align='left'>"+mensajes[i].texto+"</p>"+
+                    "</div>" );
+        }
+    }
+
+    $("#boton-enviarMensaje").click(function (){
+        $.ajax({
+            url: URLbase + "/chat/enviarMensaje",
+            type: "POST",
+            data:{
+                mensaje: $("#escribir-mensaje").val(),
+                idOferta: idOfertaSeleccionada,
+                vendedor: vendedorEmail,
+                interesado: interesadoEmail
+            },
+            dataType: 'json',
+            success: function(respuesta){
+                cargarChat();
+            },
+            error: function(error){
+                $("#widget-chat")
+                    .prepend("<div class='alert alert-danger'>No ha sido posible enviar el mensaje</div>");
+            }
+        });
+    });
+
+    cargarChat();
+
+</script>
