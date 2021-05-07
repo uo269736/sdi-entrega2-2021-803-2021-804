@@ -106,28 +106,16 @@ module.exports = function(app,swig,gestorBD) {
                     });
                 res.send(respuestaError);
             } else {
-                let criterioCompra = {"usuario": req.session.usuario};
-                gestorBD.obtenerCompras(criterioCompra, function (compras) {
-                    if (compras == null) {
+                    if (isVendedorOrComprada2(ofertas[0], req.session.usuario)) {
                         let respuestaError = swig.renderFile('views/error.html',
                             {
-                                mensajes : "Error al listar",
+                                mensajes : "No puedes comprar si eres el vendedor o ya la tienes comprada",
                                 usuario : req.session.usuario,
                                 rol : req.session.rol,
                                 saldo : req.session.saldo
                             });
                         res.send(respuestaError);
                     } else {
-                        if (isVendedorOrComprada(compras, ofertas[0], req.session.usuario)) {
-                            let respuestaError = swig.renderFile('views/error.html',
-                                {
-                                    mensajes : "No puedes comprar si eres el vendedor o ya la tienes comprada",
-                                    usuario : req.session.usuario,
-                                    rol : req.session.rol,
-                                    saldo : req.session.saldo
-                                });
-                            res.send(respuestaError);
-                        } else {
                             if(!suficienteSaldo(ofertas[0],req.session.saldo)){
                                 res.redirect("/oferta/list?mensaje=No tienes suficiente dinero para comprar esta oferta&tipoMensaje=alert-danger ");
                             }
@@ -193,9 +181,7 @@ module.exports = function(app,swig,gestorBD) {
                                 });
                             }
                         }
-                    }
-                });
-            };
+                    };
         });
     });
 
@@ -379,6 +365,14 @@ module.exports = function(app,swig,gestorBD) {
             }
             return false;
         }
+    };
+
+    function isVendedorOrComprada2(oferta, usuario) {
+        if (oferta.vendedor == usuario)
+            return true;
+        if (oferta.vendedor == usuario)
+            return true;
+        return false;
     };
 
     function suficienteSaldo(oferta, saldo) {

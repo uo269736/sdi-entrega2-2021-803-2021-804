@@ -1,16 +1,16 @@
 <div id="widget-detalles">
     <div class="form-group">
-        <label class="control-label col-sm-2" for="detalles-nombre">Nombre:</label>
+        <label class="control-label col-sm-2" for="detalles-titulo">Titulo:</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" name="detalles-nombre"
-                   placeholder="Nombre de mi canción" id="detalles-nombre" readonly/>
+            <input type="text" class="form-control" name="detalles-titulo"
+                   placeholder="Titulo de la oferta" id="detalles-titulo" readonly/>
         </div>
     </div>
     <div class="form-group">
-        <label class="control-label col-sm-2" for="detalles-genero">Genero:</label>
+        <label class="control-label col-sm-2" for="detalles-descripcion">Descripción:</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" name="detalles-genero"
-                   placeholder="Nombre de mi canción" id="detalles-genero" readonly/>
+            <input type="text" class="form-control" name="detalles-descripcion"
+                   placeholder="Descripción de la oferta" id="detalles-descripcion" readonly/>
         </div>
     </div>
     <div class="form-group">
@@ -20,22 +20,31 @@
                    placeholder="2.50" id="detalles-precio" readonly/>
         </div>
     </div>
-    <button onclick="widgetCanciones()" class="btn" >Volver</button>
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="detalles-vendedor">Vendedor:</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" name="detalles-vendedor"
+                   placeholder="Vendedor de la oferta" id="detalles-vendedor" readonly/>
+        </div>
+    </div>
+    <a align="right"><button class="btn btn-default pull-right">Habla con el vendedor</button></a>
+    <button onclick="widgetOfertas()" class="btn btn-default" >Volver</button>
 </div>
 
 <script>
     $.ajax({
-        url : URLbase + "/cancion/" + idCancionSeleccionada ,
+        url : URLbase + "/oferta/" + idOfertaSeleccionada ,
         type : "GET",
         data : {},
         dataType : 'json',
         headers : {
             "token" : token
         },
-        success : function(cancion) {
-            $("#detalles-nombre").val(cancion.nombre);
-            $("#detalles-genero").val(cancion.genero);
-            $("#detalles-precio").val(cancion.precio);
+        success : function(oferta) {
+            $("#detalles-titulo").val(oferta.titulo);
+            $("#detalles-descripcion").val(oferta.descripcion);
+            $("#detalles-precio").val(oferta.precio);
+            $("#detalles-vendedor").val(oferta.vendedor);
         },
         error : function(error) {
             $( "#contenedor-principal" ).load("widget-login.html");
