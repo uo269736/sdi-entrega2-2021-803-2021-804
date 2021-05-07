@@ -121,6 +121,23 @@ routerUsuarioVendedor.use(function(req, res, next) {
 app.use("/oferta/eliminar",routerUsuarioVendedor);
 app.use("/oferta/destacar",routerUsuarioVendedor);
 
+//routerUsuarioIniciarSesion
+let routerUsuarioIniciarSesion = express.Router();
+routerUsuarioIniciarSesion.use(function(req, res, next) {
+    console.log("routerUsuarioIniciarSesion");
+    if ( !req.session.usuario) {
+        // dejamos correr la petición
+        next();
+    } else {
+        console.log("va a : "+req.session.destino)
+        res.redirect("/home");
+    }
+});
+
+//Aplicar routerAdmin
+app.use("/registrarse",routerUsuarioIniciarSesion);
+app.use("/identificarse",routerUsuarioIniciarSesion);
+
 //routerUsuarioAdmin
 let routerUsuarioAdmin = express.Router();
 routerUsuarioAdmin.use(function(req, res, next) {
@@ -184,7 +201,6 @@ app.use(function (err, req, res, next){
         res.send("Recurso no disponible");
     }
 });
-
 
 //lanzar el servidor
 https.createServer({

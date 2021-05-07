@@ -218,7 +218,6 @@ module.exports = function(app,swig,gestorBD) {
                 }
                 let criterio = { "_id" : { $in: ofertasCompradasIds } }
                 gestorBD.obtenerOfertas(criterio,function (ofertas){
-                    console.log(ofertas)
                     let respuesta = swig.renderFile('views/bcompradas.html',
                         {
                             ofertas : ofertas,
@@ -306,6 +305,9 @@ module.exports = function(app,swig,gestorBD) {
                 gestorBD.obtenerCompras(criterio, function (compras) {
                     let respuesta = swig.renderFile('views/boferta.html',
                         {
+                            usuario : req.session.usuario,
+                            rol : req.session.rol,
+                            saldo : req.session.saldo,
                             oferta: ofertas[0],
                             propietario: isVendedorOrComprada(compras, ofertas[0], req.session.usuario)
                         });

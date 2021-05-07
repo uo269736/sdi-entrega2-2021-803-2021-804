@@ -14,7 +14,7 @@
 			 <h2>{{ oferta.titulo }}</h2>
 			 <p>{{ oferta.descripcion }}</p>
 			 <p>Vendedor: {{ oferta.vendedor }}</p>
-			  {% if !propietario %}
+			  {% if oferta.comprador==null || oferta.vendedor==usuario %}
 				  <a class="btn btn-primary pull-right"
 					 href="/oferta/comprar/{{oferta._id.toString()}}">{{ oferta.precio }} € </a>
 			  {% endif %}
