@@ -1,0 +1,106 @@
+<div id="widget-ofertas" >
+    <input type="text" class="form-control" placeholder="Filtrar por Titulo"
+           id="filtro-titulo"/>
+    <button class="btn" onclick="cargarOfertas()" >Actualizar</button>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th><a onclick="ordenarPorTitulo()">Titulo</a></th>
+            <th><a onclick="ordenarPorPrecio()">Precio</a></th>
+            <th class="col-md-1"></th>
+        </tr>
+        </thead>
+        <tbody id="tablaCuerpo">
+
+        </tbody>
+    </table>
+</div>
+<script>
+    window.history.pushState("", "", "/cliente.html?w=ofertas");
+    var ofertas;
+    function cargarOfertas(){
+        $.ajax({
+            url: URLbase + "/oferta",
+            type: "GET",
+            data: { },
+            dataType: 'json',
+            headers: { "token": token },
+            success: function(respuesta) {
+                ofertas = respuesta;
+                actualizarTabla(ofertas);
+            },
+            error : function (error){
+                $( "#contenedor-principal" ).load("widget-login.html");
+            }
+        });
+    }
+    function actualizarTabla(ofertasMostrar){
+        $( "#tablaCuerpo" ).empty(); // Vaciar la tabla
+        for (i = 0; i < ofertasMostrar.length; i++) {
+            $( "#tablaCuerpo" ).append(
+                "<tr id="+ofertasMostrar[i]._id+">"+
+                "<td>"+ofertasMostrar[i].titulo+"</td>" +
+                "<td>"+ofertasMostrar[i].descripcion+"</td>" +
+                "<td>"+ofertasMostrar[i].precio+"</td>" +
+                "<td>"+ofertasMostrar[i].vendedor+"</td>" +
+                "<td>"+
+                "<a onclick=detalles('"+ofertasMostrar[i]._id+"')>Detalles</a><br>"+
+                "</td>"+
+                "</tr>" );
+        }
+    }
+    cargarOfertas();
+
+    function detalles(_id) {
+        idOfertaSeleccionada = _id;
+        $( "#contenedor-principal" ).load( "widget-detalles.html");
+    }
+
+    $('#filtro-titulo').on('input',function(e){
+        var ofertasFiltradas = [];
+        var tituloFiltro = $("#filtro-titulo").val();
+
+        for (i = 0; i < ofertas.length; i++) {
+            if (ofertas[i].titulo.indexOf(tituloFiltro) != -1 ){
+                ofertasFiltradas.push(ofertas[i]);
+            }
+        }
+        actualizarTabla(ofertasFiltradas);
+    });
+
+    var precioDsc = true;
+    function ordenarPorPrecio(){
+        if (precioDsc){
+            ofertas.sort(function(a, b) {
+                return parseFloat(a.precio) - parseFloat(b.precio);
+            });
+        } else {
+            ofertas.sort(function(a, b) {
+                return parseFloat(b.precio) - parseFloat(a.precio);
+            });
+        }
+        actualizarTabla(ofertas);
+        precioDsc = !precioDsc; //invertir
+    }
+    var tituloDsc = false;
+    function ordenarPorTitulo() {
+        if (tituloDsc) {
+            ofertas.sort(function (a, b) {
+                if (a.titulo > b.titulo) return 1;
+                if (a.titulo < b.titulo) return -1;
+                return 0;
+            });
+        }
+        else
+        {
+            ofertas.sort(function (a, b) {
+                if (b.titulo > a.titulo) return 1;
+                if (b.titulo < a.titulo) return -1;
+                return 0;
+            });
+        }
+        actualizarTabla(ofertas);
+
+        tituloDsc = !tituloDsc; //invertir
+    }
+</script>
