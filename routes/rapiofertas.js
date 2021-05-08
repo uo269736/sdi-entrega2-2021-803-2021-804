@@ -160,11 +160,11 @@ module.exports = function(app, gestorBD) {
 
     function obtenerConversaciones(mensajes){
         let conversaciones=[];
-        for(i=0;i<mensajes.length;i++) {
+        for(let i=0;i<mensajes.length;i++) {
             if (!existeConversacion(conversaciones,mensajes[i]))
                 conversaciones.push(mensajes[i]);
-        }console.log(conversaciones);
-        return conversaciones;
+        }
+        return ofertasAjenas;
     }
 
     function existeConversacion(conversaciones,mensaje){
