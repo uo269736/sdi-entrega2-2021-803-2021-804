@@ -60,7 +60,7 @@ module.exports = function(app, gestorBD) {
     });
 
     app.get("/api/chat/:idOferta/:emailVendedor/:emailInteresado", function(req, res) {
-        let criterio ={"idOferta" : gestorBD.mongo.ObjectID(req.params.idOferta),"emailVendedor":req.params.emailVendedor,"emailInteresado": req.params.emailInteresado}
+        let criterio ={"idOferta" : req.params.idOferta,"emailVendedor":req.params.emailVendedor,"emailInteresado": req.params.emailInteresado}
         gestorBD.obtenerMensajes(criterio , function(mensajes) {
             if (mensajes == null) {
                 res.status(500);
@@ -68,6 +68,7 @@ module.exports = function(app, gestorBD) {
                     error : "se ha producido un error"
                 })
             } else {
+                console.log(mensajes)
                 res.status(200);
                 res.send( JSON.stringify(mensajes) );
             }
