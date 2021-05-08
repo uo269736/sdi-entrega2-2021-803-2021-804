@@ -72,24 +72,32 @@ module.exports = function(app, gestorBD) {
         let criterioMarcarLeido = {"idOferta" : req.params.idOferta,"emailVendedor":req.params.emailVendedor,"emailInteresado": req.params.emailInteresado, "escritor": escritor, "leido": false}
         // Comprobamos si tenemos mensajes que marcar como vistos
         gestorBD.marcarComoLeido(criterioMarcarLeido, function (result){
-            gestorBD.obtenerMensajes(criterio , function(mensajes) {
-
-                if (mensajes == null) {
-                    res.status(500);
-                    res.json({
-                        error : "se ha producido un error"
-                    })
-                } else {
-                    res.status(200);
-                    res.send( JSON.stringify(mensajes) );
-                }
-            });
+            if(result == null) {
+                res.status(500);
+                res.json({
+                    error: "se ha producido un error"
+                })
+            }else {
+                gestorBD.obtenerMensajes(criterio, function (mensajes) {
+                    if (mensajes == null) {
+                        res.status(500);
+                        res.json({
+                            error: "se ha producido un error"
+                        })
+                    } else {
+                        res.status(200);
+                        res.send(JSON.stringify(mensajes));
+                    }
+                });
+            }
         });
     });
 
     app.post("/api/chat/enviarMensaje", function(req, res) {
+        let d=new Date();
         let mensaje = {
             idOferta : req.body.idOferta,
+            tituloOferta:req.body.tituloOferta,
             emailVendedor : req.body.vendedor,
             emailInteresado : req.body.interesado,
             escritor : req.session.usuario,
@@ -110,15 +118,21 @@ module.exports = function(app, gestorBD) {
         });
     });
 
-    function propietario(req, criterio){
-        gestorBD.obtenerOfertas(criterio,function(ofertas) {
-            if (req.session.usuario == null || ofertas == null)
-                return false;
-            else {
-                return req.session.usuario == (ofertas[0].vendedor);
+    app.get("/api/conversaciones", function(req, res) {
+        let criterio = {$or: [{"emailVendedor":req.session.usuario},{"emailInteresado":req.session.usuario}]};
+        gestorBD.obtenerMensajes(criterio , function(mensajes) {
+            if (ofertas == null) {
+                res.status(500);
+                res.json({
+                    error : "se ha producido un error"
+                })
+            } else {
+                let conversaciones=obtenerConversaciones(mensajes)
+                res.status(200);
+                res.send( JSON.stringify(conversaciones) );
             }
         });
-    }
+    });
 
     function ofertasAjenas(ofertas, usuario){
         let ofertasAjenas=[];
@@ -127,5 +141,24 @@ module.exports = function(app, gestorBD) {
                 ofertasAjenas.push(ofertas[i]);
         }
         return ofertasAjenas;
+    }
+
+    function obtenerConversaciones(mensajes){
+        let conversaciones=[];
+        for(let i=0;i<mensajes.length;i++) {
+            if (!existeConversacion(conversaciones,mensajes[i]))
+                conversaciones.push(mensajes[i]);
+        }
+        return ofertasAjenas;
+    }
+
+    function existeConversacion(conversaciones,mensaje){
+        for(let i=0;i<conversaciones.length;i++) {
+            if (conversaciones[i].idOferta==mensaje.idOferta &&
+                conversaciones[i].emailInteresado==mensaje.emailInteresado &&
+                conversaciones[i].emailVendedor==mensaje.emailVendedor)
+                return true;
+        }
+        return false;
     }
 };

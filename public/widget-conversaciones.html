@@ -1,0 +1,100 @@
+<div id="widget-ofertas" >
+    <input type="text" class="form-control" placeholder="Filtrar por Titulo"
+           id="filtro-titulo"/>
+    <p></p>
+    <button  class="btn btn-default" onclick="cargarConversaciones()" >Actualizar</button>
+    <p></p>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th><a onclick="ordenarPorTitulo()">Titulo de la oferta</a></th>
+            <th>Vendedor</th>
+            <th>Comprador</th>
+            <th class="col-md-1"></th>
+            <th class="col-md-1"></th>
+        </tr>
+        </thead>
+        <tbody id="tablaCuerpo">
+
+        </tbody>
+    </table>
+</div>
+
+<script>
+    window.history.pushState("", "", "/cliente.html?w=conversaciones");
+    var conversaciones;
+    function cargarConversaciones(){
+        $.ajax({
+            url: URLbase + "/conversaciones",
+            type: "GET",
+            data: { },
+            dataType: 'json',
+            headers: { "token": token },
+            success: function(respuesta) {
+                conversaciones = respuesta;
+                actualizarTabla(conversaciones);
+            },
+            error : function (error){
+                $( "#contenedor-principal" ).load("widget-login.html");
+            }
+        });
+    }
+    function actualizarTabla(conversaciones){
+        $( "#tablaCuerpo" ).empty(); // Vaciar la tabla
+        if(conversaciones!=null)
+            for (i = 0; i < conversaciones.length; i++) {
+                $( "#tablaCuerpo" ).append(
+                    "<tr id="+conversaciones[i]._id+">"+
+                    "<td>"+conversaciones[i].tituloOferta+"</td>" +
+                    "<td>"+conversaciones[i].vendedor+"</td>" +
+                    "<td>"+conversaciones[i].interesado+"</td>" +
+                    "<td>"+
+                    "<button class=\"btn btn-default\" onclick=muestraChat('"+conversaciones[i].idOferta+"','"+conversaciones[i].emailVendedor+"','"+conversaciones[i].emailInteresado+"','"+(conversaciones[i].tituloOferta).replaceAll(" ","_")+"')>Entrar al chat</button><br>"+
+                    "</td>"+
+                    "</tr>" );
+            }
+    }
+    cargarOfertas();
+
+    $('#filtro-titulo').on('input',function(e){
+        var ofertasFiltradas = [];
+        var tituloFiltro = $("#filtro-titulo").val();
+
+        for (i = 0; i < ofertas.length; i++) {
+            if (ofertas[i].titulo.toLowerCase().indexOf(tituloFiltro.toLowerCase()) != -1 ){
+                ofertasFiltradas.push(ofertas[i]);
+            }
+        }
+        actualizarTabla(ofertasFiltradas);
+    });
+
+    var tituloDsc = false;
+    function ordenarPorTitulo() {
+        if (tituloDsc) {
+            ofertas.sort(function (a, b) {
+                if (a.titulo > b.titulo) return 1;
+                if (a.titulo < b.titulo) return -1;
+                return 0;
+            });
+        }
+        else
+        {
+            ofertas.sort(function (a, b) {
+                if (b.titulo > a.titulo) return 1;
+                if (b.titulo < a.titulo) return -1;
+                return 0;
+            });
+        }
+        actualizarTabla(ofertas);
+
+        tituloDsc = !tituloDsc; //invertir
+    }
+
+    function muestraChat(_id,vendedor,interesado,titulo){
+            tituloOferta = titulo.replaceAll("_"," ");
+            idOfertaSeleccionada = _id;
+            vendedorEmail = vendedor;
+            interesadoEmail = interesado;
+            $( "#contenedor-principal" ).load( "widget-chat.html");
+    }
+</script>
