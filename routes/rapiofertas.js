@@ -118,6 +118,21 @@ module.exports = function(app, gestorBD) {
         });
     });
 
+    app.post("/api/conversaciones/borrar/:idOferta/:emailInteresado", function(req, res) {
+        let criterio = {"idOferta" : req.params.idOferta,"emailInteresado": req.params.emailInteresado} // Criterio para borrar toda la conversacion
+        gestorBD.eliminarMensaje(criterio, function(mensajes){
+            if (mensajes == null) {
+                res.status(500);
+                res.json({
+                    error : "se ha producido un error"
+                })
+            } else {
+                res.status(200);
+                res.json(JSON.stringify(mensajes))
+            }
+        });
+    });
+
     app.get("/api/conversaciones", function(req, res) {
         let criterio = {$or: [{"emailVendedor":req.session.usuario},{"emailInteresado":req.session.usuario}]};
         gestorBD.obtenerMensajes(criterio , function(mensajes) {

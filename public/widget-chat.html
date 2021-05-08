@@ -1,5 +1,5 @@
 <div id="widget-chat" >
-
+    <button onclick="salirChat()" class="btn btn-default" >Volver</button>
     <div id="chat">
 
     </div>
@@ -26,7 +26,10 @@
             }
         });
     }
-
+    function salirChat(){
+        clearInterval(update);
+        widgetConversaciones();
+    }
 
     function actualizarChat(mensajes){
         let receptor;
@@ -38,7 +41,6 @@
         }
         $( "#chat" ).empty(); // Vaciar la tabla
         $( "#chat" ).append(
-            "<button onclick=\"widgetOfertas()\" class=\"btn btn-default\" >Volver</button>"+
             "<h2 align='center'>"+tituloOferta+"</h2>"+
             "<div class=\"form-horizontal\">"+
                 "<span><strong>"+receptor+"</strong></span>"+
@@ -92,6 +94,5 @@
 
     cargarChat();
     //setTimeout(cargarChat,5000);      // Si hubiera algun bug de carga, descomentar esto podria solucionarlo
-    setInterval(cargarChat,3000);       // Se actualizara el chat cada 3 segundos automaticamente
-
+    update = setInterval(cargarChat,3000);       // Se actualizara el chat cada 3 segundos automaticamente
 </script>
