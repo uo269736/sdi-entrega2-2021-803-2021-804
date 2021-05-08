@@ -60,27 +60,41 @@ module.exports = function(app, gestorBD) {
     });
 
     app.get("/api/chat/:idOferta/:emailVendedor/:emailInteresado", function(req, res) {
-        let criterio ={"idOferta" : gestorBD.mongo.ObjectID(req.params.idOferta),"emailVendedor":req.params.emailVendedor,"emailInteresado": req.params.emailInteresado}
-        gestorBD.obtenerMensajes(criterio , function(mensajes) {
-            if (mensajes == null) {
-                res.status(500);
-                res.json({
-                    error : "se ha producido un error"
-                })
-            } else {
-                res.status(200);
-                res.send( JSON.stringify(mensajes) );
-            }
+        let criterio ={"idOferta" : req.params.idOferta,"emailVendedor":req.params.emailVendedor,"emailInteresado": req.params.emailInteresado}
+
+        // En este metodo tambien marcaremos los mensajes como leídos si usuario = destinatrio
+        let escritor="";
+        // Para los mensajes que marcaremos como leidos, su escritor no puede ser el usuario en sesion
+        if(req.session.usuario==req.params.emailVendedor)
+            escritor = req.params.emailInteresado;
+        else
+            escritor = req.params.emailVendedor;
+        let criterioMarcarLeido = {"idOferta" : req.params.idOferta,"emailVendedor":req.params.emailVendedor,"emailInteresado": req.params.emailInteresado, "escritor": escritor, "leido": false}
+        // Comprobamos si tenemos mensajes que marcar como vistos
+        gestorBD.marcarComoLeido(criterioMarcarLeido, function (result){
+            gestorBD.obtenerMensajes(criterio , function(mensajes) {
+
+                if (mensajes == null) {
+                    res.status(500);
+                    res.json({
+                        error : "se ha producido un error"
+                    })
+                } else {
+                    res.status(200);
+                    res.send( JSON.stringify(mensajes) );
+                }
+            });
         });
     });
 
     app.post("/api/chat/enviarMensaje", function(req, res) {
+        let d=new Date();
         let mensaje = {
             idOferta : req.body.idOferta,
             emailVendedor : req.body.vendedor,
             emailInteresado : req.body.interesado,
             escritor : req.session.usuario,
-            fecha : Date.now()/1000,
+            fecha : d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear()+" - "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds(),
             leido : false,
             texto :req.body.mensaje
         }
