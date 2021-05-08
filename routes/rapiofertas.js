@@ -149,7 +149,7 @@ module.exports = function(app, gestorBD) {
             if (!existeConversacion(conversaciones,mensajes[i]))
                 conversaciones.push(mensajes[i]);
         }
-        return ofertasAjenas;
+        return conversaciones;
     }
 
     function existeConversacion(conversaciones,mensaje){
