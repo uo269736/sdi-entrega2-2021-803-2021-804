@@ -3,11 +3,10 @@
     <div id="chat">
 
     </div>
-    <input type="text" class="form-control" placeholder="Escribe aqui tu mensaje"
-           id="escribir-mensaje"/>
-    <button class="btn" id="boton-enviarMensaje">Enviar</button>
-
-</div>
+        <input type="text" class="form-control" placeholder="Escribe aqui tu mensaje"
+               id="escribir-mensaje"/><p></p>
+        <button type="submit" class="btn btn-primary" id="boton-enviarMensaje">Enviar</button>
+    </div>
 <script>
     window.history.pushState("", "", "/cliente.html?w=chat");
     var mensajes;
@@ -30,44 +29,67 @@
 
 
     function actualizarChat(mensajes){
+        let receptor;
+
+        if(vendedorEmail==emailUsuario){
+            receptor = interesadoEmail;
+        }else{
+            receptor = vendedorEmail;
+        }
         $( "#chat" ).empty(); // Vaciar la tabla
+        $( "#chat" ).append(
+            "<button onclick=\"widgetOfertas()\" class=\"btn btn-default\" >Volver</button>"+
+            "<h2 align='center'>"+tituloOferta+"</h2>"+
+            "<div class=\"form-horizontal\">"+
+                "<span><strong>"+receptor+"</strong></span>"+
+            "</div>"
+        );
         for (i = 0; i < mensajes.length; i++) {
+            // Los mensajes del escritor -> derecha, los del destinatario -> izquierda
+            let alineado;
             if(mensajes[i].escritor==emailUsuario)
-                $( "#chat" ).append(
-                    "<div id="+mensajes[i]._id+">"+
-                    "<p align='right'>("+mensajes[i].fecha+")</p>"+
-                    "<p align='right'>"+mensajes[i].texto+"</p>"+
-                    "</div>" );
+                alineado = "'right'"
             else
-                $( "#chat" ).append(
-                    "<div id="+mensajes[i]._id+">"+
-                    "<p align='left'>("+mensajes[i].fecha+")</p>"+
-                    "<p align='left'>"+mensajes[i].texto+"</p>"+
-                    "</div>" );
+                alineado = "'left'"
+            let mensaje = "<div id=" + mensajes[i]._id + ">" +
+                "<p align="+alineado+" style='color:dimgray'>(" + mensajes[i].fecha + ")</p>" +
+                "<p align="+alineado+">" + mensajes[i].texto + "</p>";
+            //Mostramos si se ha leído o no el mensaje
+            if (mensajes[i].leido == true) {
+                mensaje += "<p class='small' align="+alineado+" style='color:green'><em>Leido</em></p></div>";
+            } else {
+                mensaje += "<p class='small' align="+alineado+" style='color:coral'><em>No leido</em></p></div>";
+            }
+            $("#chat").append(mensaje);
         }
     }
 
     $("#boton-enviarMensaje").click(function (){
-        $.ajax({
-            url: URLbase + "/chat/enviarMensaje",
-            type: "POST",
-            data:{
-                mensaje: $("#escribir-mensaje").val(),
-                idOferta: idOfertaSeleccionada,
-                vendedor: vendedorEmail,
-                interesado: interesadoEmail
-            },
-            dataType: 'json',
-            success: function(respuesta){
-                cargarChat();
-            },
-            error: function(error){
-                $("#widget-chat")
-                    .prepend("<div class='alert alert-danger'>No ha sido posible enviar el mensaje</div>");
-            }
-        });
+        // si el mensaje es una cadena vacia no se podrá enviar mensajes (o )
+        if($("#escribir-mensaje").val()!="") {
+            $.ajax({
+                url: URLbase + "/chat/enviarMensaje",
+                type: "POST",
+                data: {
+                    mensaje: $("#escribir-mensaje").val(),
+                    idOferta: idOfertaSeleccionada,
+                    vendedor: vendedorEmail,
+                    interesado: interesadoEmail
+                },
+                dataType: 'json',
+                success: function (respuesta) {
+                    cargarChat();
+                },
+                error: function (error) {
+                    $("#widget-chat")
+                        .prepend("<div class='alert alert-danger'>No ha sido posible enviar el mensaje</div>");
+                }
+            });
+        }
     });
 
     cargarChat();
+    //setTimeout(cargarChat,5000);      // Si hubiera algun bug de carga, descomentar esto podria solucionarlo
+    setInterval(cargarChat,3000);       // Se actualizara el chat cada 3 segundos automaticamente
 
 </script>

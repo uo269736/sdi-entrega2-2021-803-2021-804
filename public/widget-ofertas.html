@@ -1,7 +1,9 @@
 <div id="widget-ofertas" >
     <input type="text" class="form-control" placeholder="Filtrar por Titulo"
            id="filtro-titulo"/>
-    <button class="btn" onclick="cargarOfertas()" >Actualizar</button>
+    <p></p>
+    <button  class="btn btn-default" onclick="cargarOfertas()" >Actualizar</button>
+    <p></p>
     <table class="table table-hover">
         <thead>
         <tr>
@@ -50,7 +52,7 @@
                 "<a onclick=detalles('"+ofertasMostrar[i]._id+"')>Detalles</a><br>"+
                 "</td>"+
                 "<td>"+
-                "<button class=\"btn btn-default\" onclick=muestraChat('"+ofertasMostrar[i]._id+"','"+ofertasMostrar[i].vendedor+"')>Habla con el vendedor</button><br>"+
+                "<button class=\"btn btn-default\" onclick=muestraChat('"+ofertasMostrar[i]._id+"','"+ofertasMostrar[i].vendedor+"','"+ofertasMostrar[i].titulo+"')>Habla con el vendedor</button><br>"+
                 "</td>"+
                 "</tr>" );
         }
@@ -67,7 +69,7 @@
         var tituloFiltro = $("#filtro-titulo").val();
 
         for (i = 0; i < ofertas.length; i++) {
-            if (ofertas[i].titulo.indexOf(tituloFiltro) != -1 ){
+            if (ofertas[i].titulo.toLowerCase().indexOf(tituloFiltro.toLowerCase()) != -1 ){
                 ofertasFiltradas.push(ofertas[i]);
             }
         }
@@ -110,10 +112,16 @@
         tituloDsc = !tituloDsc; //invertir
     }
 
-    function muestraChat(_id,vendedor){
-        idOfertaSeleccionada = _id;
-        vendedorEmail = vendedor;
-        interesadoEmail = emailUsuario;
-        $( "#contenedor-principal" ).load( "widget-chat.html");
+    function muestraChat(_id,vendedor,titulo){
+        if( Cookies.get('token') != null){
+            tituloOferta = titulo;
+            idOfertaSeleccionada = _id;
+            vendedorEmail = vendedor;
+            interesadoEmail = emailUsuario;
+
+            token = Cookies.get('token');
+            $( "#contenedor-principal" ).load( "widget-chat.html");
+        }
+
     }
 </script>
