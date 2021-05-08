@@ -121,7 +121,7 @@ module.exports = function(app, gestorBD) {
     app.get("/api/conversaciones", function(req, res) {
         let criterio = {$or: [{"emailVendedor":req.session.usuario},{"emailInteresado":req.session.usuario}]};
         gestorBD.obtenerMensajes(criterio , function(mensajes) {
-            if (ofertas == null) {
+            if (mensajes == null) {
                 res.status(500);
                 res.json({
                     error : "se ha producido un error"
@@ -145,11 +145,11 @@ module.exports = function(app, gestorBD) {
 
     function obtenerConversaciones(mensajes){
         let conversaciones=[];
-        for(let i=0;i<mensajes.length;i++) {
+        for(i=0;i<mensajes.length;i++) {
             if (!existeConversacion(conversaciones,mensajes[i]))
                 conversaciones.push(mensajes[i]);
-        }
-        return ofertasAjenas;
+        }console.log(conversaciones);
+        return conversaciones;
     }
 
     function existeConversacion(conversaciones,mensaje){

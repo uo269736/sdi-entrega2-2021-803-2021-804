@@ -79,6 +79,7 @@
                 },
                 dataType: 'json',
                 success: function (respuesta) {
+                    $("#escribir-mensaje").val("");
                     cargarChat();
                 },
                 error: function (error) {
