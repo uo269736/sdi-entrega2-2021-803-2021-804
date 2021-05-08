@@ -49,8 +49,9 @@
                     "<td>"+conversaciones[i].vendedor+"</td>" +
                     "<td>"+conversaciones[i].interesado+"</td>" +
                     "<td>"+
-                    "<button class=\"btn btn-default\" onclick=muestraChat('"+conversaciones[i].idOferta+"','"+conversaciones[i].emailVendedor+"','"+conversaciones[i].emailInteresado+"','"+(conversaciones[i].tituloOferta).replaceAll(" ","_")+"')>Entrar al chat</button><br>"+
+                    "<button class=\"btn btn-primary\" onclick=muestraChat('"+conversaciones[i].idOferta+"','"+conversaciones[i].emailVendedor+"','"+conversaciones[i].emailInteresado+"','"+(conversaciones[i].tituloOferta).replaceAll(" ","_")+"')>Entrar al chat</button><br>"+
                     "</td>"+
+                    "<td><button class=\"btn btn-danger\" onclick=eliminarConversacion('"+conversaciones[i].idOferta+"','"+conversaciones[i].emailInteresado+"')>Borrar Conversación</button></td>"+
                     "</tr>" );
             }
     }
@@ -96,5 +97,21 @@
             vendedorEmail = vendedor;
             interesadoEmail = interesado;
             $( "#contenedor-principal" ).load( "widget-chat.html");
+    }
+
+    function eliminarConversacion(idOferta, emailInteresado){
+        $.ajax({
+            url: URLbase + "/conversaciones/borrar/"+idOferta+"/"+emailInteresado,
+            type: "POST",
+            data: { },
+            dataType: 'json',
+            headers: { "token": token },
+            success: function(respuesta) {
+                cargarConversaciones();
+            },
+            error : function (error){
+                $( "#contenedor-principal" ).load("widget-conversaciones.html");
+            }
+        });
     }
 </script>
