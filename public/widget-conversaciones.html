@@ -11,7 +11,6 @@
             <th>Vendedor</th>
             <th>Comprador</th>
             <th class="col-md-1"></th>
-            <th class="col-md-1"></th>
         </tr>
         </thead>
         <tbody id="tablaCuerpo">
@@ -41,20 +40,19 @@
     }
     function actualizarTabla(conversaciones){
         $( "#tablaCuerpo" ).empty(); // Vaciar la tabla
-        if(conversaciones!=null)
-            for (i = 0; i < conversaciones.length; i++) {
-                $( "#tablaCuerpo" ).append(
-                    "<tr id="+conversaciones[i]._id+">"+
-                    "<td>"+conversaciones[i].tituloOferta+"</td>" +
-                    "<td>"+conversaciones[i].vendedor+"</td>" +
-                    "<td>"+conversaciones[i].interesado+"</td>" +
-                    "<td>"+
-                    "<button class=\"btn btn-default\" onclick=muestraChat('"+conversaciones[i].idOferta+"','"+conversaciones[i].emailVendedor+"','"+conversaciones[i].emailInteresado+"','"+(conversaciones[i].tituloOferta).replaceAll(" ","_")+"')>Entrar al chat</button><br>"+
-                    "</td>"+
-                    "</tr>" );
-            }
+        for (i = 0; i < conversaciones.length; i++) {
+            $( "#tablaCuerpo" ).append(
+                "<tr id="+conversaciones[i]._id+">"+
+                "<td>"+conversaciones[i].tituloOferta+"</td>" +
+                "<td>"+conversaciones[i].emailVendedor+"</td>" +
+                "<td>"+conversaciones[i].emailInteresado+"</td>" +
+                "<td>"+
+                "<button class=\"btn btn-default\" onclick=muestraChat('"+conversaciones[i].idOferta+"','"+(conversaciones[i].tituloOferta).replaceAll(" ","_")+"','"+conversaciones[i].emailVendedor+"','"+conversaciones[i].emailInteresado+"')>Entrar al chat</button><br>"+
+                "</td>"+
+                "</tr>" );
+        }
     }
-    cargarOfertas();
+    cargarConversaciones();
 
     $('#filtro-titulo').on('input',function(e){
         var ofertasFiltradas = [];
@@ -90,7 +88,7 @@
         tituloDsc = !tituloDsc; //invertir
     }
 
-    function muestraChat(_id,vendedor,interesado,titulo){
+    function muestraChat(_id,titulo,vendedor,interesado){
             tituloOferta = titulo.replaceAll("_"," ");
             idOfertaSeleccionada = _id;
             vendedorEmail = vendedor;
