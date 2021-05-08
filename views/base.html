@@ -53,14 +53,14 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
           {% if usuario == null %}
-	            <li><a href="/registrarse"><span class="glyphicon glyphicon-user"></span> Registrate</a></li>
-                <li><a href="/identificarse"><span class="glyphicon glyphicon-log-in"></span> Identifícate</a></li>
+	            <li><a href="/registrarse" id="signup"><span class="glyphicon glyphicon-user"></span> Registrate</a></li>
+                <li><a href="/identificarse" id="login"><span class="glyphicon glyphicon-log-in"></span> Identifícate</a></li>
           {% else %}
             {% if rol!= "admin" %}
                     <li><a>Saldo: {{ saldo }} €</a></li>
             {% endif %}
                 <li><a>{{ usuario }}</a></li>
-                <li><a href="/desconectarse"><span class="glyphicon glyphicon-log-out"></span> Desconectarse</a></li>
+                <li><a href="/desconectarse" id="logout"><span class="glyphicon glyphicon-log-out"></span> Desconectarse</a></li>
           {% endif %}
       </ul>
     </div>

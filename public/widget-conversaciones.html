@@ -46,8 +46,8 @@
                 $( "#tablaCuerpo" ).append(
                     "<tr id="+conversaciones[i]._id+">"+
                     "<td>"+conversaciones[i].tituloOferta+"</td>" +
-                    "<td>"+conversaciones[i].vendedor+"</td>" +
-                    "<td>"+conversaciones[i].interesado+"</td>" +
+                    "<td>"+conversaciones[i].emailVendedor+"</td>" +
+                    "<td>"+conversaciones[i].emailInteresado+"</td>" +
                     "<td>"+
                     "<button class=\"btn btn-primary\" onclick=muestraChat('"+conversaciones[i].idOferta+"','"+conversaciones[i].emailVendedor+"','"+conversaciones[i].emailInteresado+"','"+(conversaciones[i].tituloOferta).replaceAll(" ","_")+"')>Entrar al chat</button><br>"+
                     "</td>"+
