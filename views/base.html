@@ -72,10 +72,7 @@
     <script>
         var mensaje = getUrlParameter('mensaje');
         var tipoMensaje = getUrlParameter('tipoMensaje');
-        // Otra forma de recuperar los parametros de la url pero no compatible con IE
-        /* const params = new URLSearchParams(location.search);
-        var mensaje = params.get("mensaje");
-        var tipoMensaje = params.get("mensaje");*/
+
         if ( mensaje != ""){
           if (tipoMensaje == "" ){
             tipoMensaje = 'alert-info';
@@ -83,6 +80,12 @@
           $( ".container" )
                   .append("<div class='alert "+tipoMensaje+"'>"+mensaje+" </div>");
         }
+
+        /**
+         * Metodo que devuelve el parámetro de la URL
+         * @param name Nombre
+         * @returns {string|string}
+         */
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
             var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');

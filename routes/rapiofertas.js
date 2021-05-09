@@ -1,5 +1,11 @@
 module.exports = function(app, gestorBD) {
 
+    /**
+     * /api/autenticar/
+     *
+     * Sirve para comprobar que el usuario inicia sesión correctamente y
+     * tiene un token correcto
+     */
     app.post("/api/autenticar/", function(req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
@@ -29,6 +35,12 @@ module.exports = function(app, gestorBD) {
         });
     });
 
+    /**
+     * /api/oferta/
+     *
+     * Busca en base de datos las ofertas totales exluyendo las del usuario
+     * para mostrarlas en la vista
+     */
     app.get("/api/oferta", function(req, res) {
         gestorBD.obtenerOfertas({} , function(ofertas) {
             if (ofertas == null) {
@@ -43,7 +55,12 @@ module.exports = function(app, gestorBD) {
             }
         });
     });
-
+    /**
+     * /api/oferta/:id
+     *
+     * Obtiene la oferta correspondiente con el id recibido y usado en el
+     * criterio de búsqueda en base de datos
+     */
     app.get("/api/oferta/:id", function(req, res) {
         let criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id)}
         gestorBD.obtenerOfertas(criterio,function(ofertas){
@@ -59,6 +76,12 @@ module.exports = function(app, gestorBD) {
         });
     });
 
+    /**
+     * /api/chat/:idOferta/:emailVendedor/:emailInteresado
+     *
+     * Muestra el chat del usuario con otra persona buscando los mensajes con un criterio, además
+     * al entrar al chat marca como leido los mensajes recibidos
+     */
     app.get("/api/chat/:idOferta/:emailVendedor/:emailInteresado", function(req, res) {
         let criterio ={"idOferta" : req.params.idOferta,"emailVendedor":req.params.emailVendedor,"emailInteresado": req.params.emailInteresado}
 
@@ -93,6 +116,13 @@ module.exports = function(app, gestorBD) {
         });
     });
 
+    /**
+     * /api/chat/enviarMensaje
+     *
+     * Envía un mensaje a otro usuario y lo inserta en base de datos, guardando todos
+     * los datos necesarios como id y titulo de la oferta, escritor, email del vendedor y del
+     * interesado, la fecha, el contenido del mensaje y sí ha sido leido o no
+     */
     app.post("/api/chat/enviarMensaje", function(req, res) {
         let d=new Date();
         let mensaje = {
@@ -118,6 +148,12 @@ module.exports = function(app, gestorBD) {
         });
     });
 
+    /**
+     * /api/conversaciones/borrar/:idOferta/:emailInteresado
+     *
+     * Elimina una concersación eliminando así todos los mensajes que hubo entre esos dos usuarios por
+     * una oferta concreta.
+     */
     app.post("/api/conversaciones/borrar/:idOferta/:emailInteresado", function(req, res) {
         let criterio = {"idOferta" : req.params.idOferta,"emailInteresado": req.params.emailInteresado} // Criterio para borrar toda la conversacion
         gestorBD.eliminarMensaje(criterio, function(mensajes){
@@ -133,6 +169,11 @@ module.exports = function(app, gestorBD) {
         });
     });
 
+    /**
+     * /api/chat/conversaciones
+     *
+     * Muestra las conversaciones que tiene el usuario que ha iniciado sesión
+     */
     app.get("/api/conversaciones", function(req, res) {
         let criterio = {$or: [{"emailVendedor":req.session.usuario},{"emailInteresado":req.session.usuario}]};
         gestorBD.obtenerMensajes(criterio , function(mensajes) {
@@ -149,6 +190,12 @@ module.exports = function(app, gestorBD) {
         });
     });
 
+    /**
+     * Devuelve las ofertas que hay en base de datos exluyendo las del usuario registrado
+     * @param ofertas Ofertas totales
+     * @param usuario Usuario que hay que excluir
+     * @returns {[]} Lista con las ofertas excluyendo las del usuario
+     */
     function ofertasAjenas(ofertas, usuario){
         let ofertasAjenas=[];
         for(let i=0;i<ofertas.length;i++) {
@@ -158,6 +205,12 @@ module.exports = function(app, gestorBD) {
         return ofertasAjenas;
     }
 
+    /**
+     * Método para obtener las conversaciones del usuario, extrayendo los mensajes de cada conversación
+     * y guardando uno de cada una.
+     * @param mensajes Mensajes totales en los que participa el usuario
+     * @returns {[]} Una lista con las un mensaje de cada conversación del usuario
+     */
     function obtenerConversaciones(mensajes){
         let conversaciones=[];
         for(let i=0;i<mensajes.length;i++) {
@@ -167,6 +220,13 @@ module.exports = function(app, gestorBD) {
         return conversaciones;
     }
 
+    /**
+     * Método para comprobar que al menos un mensaje de una conversación ya ha sido
+     * seleccionado.
+     * @param conversaciones La lista de conversaciones hasta el momento
+     * @param mensaje Mensaje que comprueba si está conversación ya está en la lista
+     * @returns {boolean} True si está en la lista, False si no
+     */
     function existeConversacion(conversaciones,mensaje){
         for(let i=0;i<conversaciones.length;i++) {
             if (conversaciones[i].idOferta==mensaje.idOferta &&

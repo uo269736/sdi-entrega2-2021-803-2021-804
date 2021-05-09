@@ -23,6 +23,10 @@
 <script>
     window.history.pushState("", "", "/cliente.html?w=conversaciones");
     var conversaciones;
+
+    /**
+     * Método para cargar las conversaciones
+     */
     function cargarConversaciones(){
         $.ajax({
             url: URLbase + "/conversaciones",
@@ -39,6 +43,11 @@
             }
         });
     }
+
+    /**
+     * Método para actualizar la tabla de conversaciones
+     * @param conversaciones Las conversaciones del usuario
+     */
     function actualizarTabla(conversaciones){
         $( "#tablaCuerpo" ).empty(); // Vaciar la tabla
         if(conversaciones!=null)
@@ -70,6 +79,10 @@
     });
 
     var tituloDsc = false;
+
+    /**
+     * Método que ordena las conversaciones por título
+     */
     function ordenarPorTitulo() {
         if (tituloDsc) {
             conversaciones.sort(function (a, b) {
@@ -91,6 +104,13 @@
         tituloDsc = !tituloDsc; //invertir
     }
 
+    /**
+     * Método que muestra el chat si se selecciona una conversación
+     * @param _id Id de la oferta
+     * @param vendedor Email del vendedor de la oferta
+     * @param interesado Email del interesado en comprar la oferta
+     * @param titulo Título de la oferta
+     */
     function muestraChat(_id,vendedor,interesado,titulo){
             tituloOferta = titulo.replaceAll("_"," ");
             idOfertaSeleccionada = _id;
@@ -99,6 +119,11 @@
             $( "#contenedor-principal" ).load( "widget-chat.html");
     }
 
+    /**
+     * Método para eliminar una conversación
+     * @param idOferta Id de la oferta que quieres eliminar
+     * @param emailInteresado Email del interesado
+     */
     function eliminarConversacion(idOferta, emailInteresado){
         $.ajax({
             url: URLbase + "/conversaciones/borrar/"+idOferta+"/"+emailInteresado,

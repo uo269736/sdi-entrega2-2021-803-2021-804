@@ -23,6 +23,10 @@
 <script>
     window.history.pushState("", "", "/cliente.html?w=ofertas");
     var ofertas;
+
+    /**
+     * Método para cargar las ofertas de la base de datos excluyendo las propias del usuario
+     */
     function cargarOfertas(){
         $.ajax({
             url: URLbase + "/oferta",
@@ -39,6 +43,11 @@
             }
         });
     }
+
+    /**
+     * Método para actualizar la tabla de ofertas
+     * @param ofertasMostrar Ofertas que se mostrarán en la tabla
+     */
     function actualizarTabla(ofertasMostrar){
         $( "#tablaCuerpo" ).empty(); // Vaciar la tabla
         for (i = 0; i < ofertasMostrar.length; i++) {
@@ -59,6 +68,10 @@
     }
     cargarOfertas();
 
+    /**
+     * Método para acceder a los detalles de una oferta
+     * @param _id
+     */
     function detalles(_id) {
         idOfertaSeleccionada = _id;
         $( "#contenedor-principal" ).load( "widget-detalles.html");
@@ -77,6 +90,10 @@
     });
 
     var precioDsc = true;
+
+    /**
+     * Método para ordenar las ofertas por precio
+     */
     function ordenarPorPrecio(){
         if (precioDsc){
             ofertas.sort(function(a, b) {
@@ -91,6 +108,9 @@
         precioDsc = !precioDsc; //invertir
     }
     var tituloDsc = false;
+    /**
+     * Método para ordenar las ofertas por título
+     */
     function ordenarPorTitulo() {
         if (tituloDsc) {
             ofertas.sort(function (a, b) {
@@ -112,6 +132,9 @@
         tituloDsc = !tituloDsc; //invertir
     }
 
+    /**
+     * Método que muestra el chat de la oferta seleccionda
+     */
     function muestraChat(_id,titulo,vendedor){
             tituloOferta = titulo.replaceAll("_"," ");
             idOfertaSeleccionada = _id;
