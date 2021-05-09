@@ -7,7 +7,7 @@ module.exports = function(app, swig, gestorBD) {
      * para el administrador
      */
     app.get("/usuario/list", function(req, res) {
-        gestorBD.obtenerUsuarios({},function(usuarios, total ) {
+        gestorBD.obtenerUsuarios({},function(usuarios) {
             if (usuarios == null) {
                 let respuestaError = swig.renderFile('views/error.html',
                     {
@@ -39,7 +39,7 @@ module.exports = function(app, swig, gestorBD) {
         let usuariosIds =req.body.idChecked;
         let array=Array.isArray(req.body.idChecked);
         let error=false;
-        if (usuariosIds!=undefined){
+        if (usuariosIds!==undefined){
             for (let i = 0; i < usuariosIds.length; i++){
                 let criterio = {"email": usuariosIds[i]};
                 let criterioOfertas =
@@ -72,7 +72,7 @@ module.exports = function(app, swig, gestorBD) {
                 }
             }
         }
-        if(error==true){
+        if(error===true){
             let respuestaError = swig.renderFile('views/error.html',
                 {
                     mensajes: "Error al eliminar",
@@ -140,7 +140,7 @@ module.exports = function(app, swig, gestorBD) {
             password : seguro
         }
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
-            if (usuarios == null || usuarios.length == 0) {
+            if (usuarios == null || usuarios.length === 0) {
                 req.session.usuario = null
                 res.redirect("/identificarse" +
                     "?mensaje=Email o password incorrecto"+
@@ -184,8 +184,8 @@ module.exports = function(app, swig, gestorBD) {
         let mensaje=validacionRegistro(usuario,req.body.password,req.body.passwordc);
         let criterio ={"email": req.body.email};
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
-            if (usuarios == null || usuarios.length==0) {
-                if(mensaje=="") {
+            if (usuarios == null || usuarios.length===0) {
+                if(mensaje==="") {
                     gestorBD.insertarUsuario(usuario, function (id) {
                         if (id == null) {
                             res.redirect("/registrarse?mensaje=Error al registrar usuario");
@@ -227,9 +227,9 @@ module.exports = function(app, swig, gestorBD) {
         if (password.length<5){
             mensaje+="La contraseña debe tener al menos 5 caracteres<br>";
         }
-        if (password!=passwordConfirm){
+        if (password!==passwordConfirm){
             mensaje+="Las contraseñas deben ser iguales<br>";
         }
         return mensaje;
-    };
+    }
 };

@@ -25,7 +25,14 @@ module.exports = function(app,swig,gestorBD) {
         let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
         gestorBD.eliminarOferta(criterio,function(ofertas){
             if ( ofertas == null ){
-                res.send(respuesta);
+                let respuestaError = swig.renderFile('views/error.html',
+                    {
+                        mensajes : "Error al eliminar",
+                        usuario : req.session.usuario,
+                        rol : req.session.rol,
+                        saldo : req.session.saldo
+                    });
+                res.send(respuestaError);
             } else {
                 res.redirect("/oferta/propias");
             }
@@ -209,7 +216,7 @@ module.exports = function(app,swig,gestorBD) {
                                 });
                             }
                         }
-                    };
+                    }
         });
     });
 
@@ -232,7 +239,7 @@ module.exports = function(app,swig,gestorBD) {
                 res.send(respuestaError);
             } else {
                 let ofertasCompradasIds = [];
-                for(i=0; i<compras.length; i++){
+                for(let i=0; i<compras.length; i++){
                     ofertasCompradasIds.push( compras[i]._id );
                 }
                 let criterio = { "_id" : { $in: ofertasCompradasIds } }
@@ -285,6 +292,7 @@ module.exports = function(app,swig,gestorBD) {
                                         rol : req.session.rol,
                                         saldo : req.session.saldo
                                     });
+                                res.send(respuestaError);
                             }else{
                                 let cantidad = req.session.saldo - 20;
                                 req.session.saldo = cantidad;
@@ -363,10 +371,10 @@ module.exports = function(app,swig,gestorBD) {
             fecha : d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear(),
             vendedor: req.session.usuario,
             comprador : null,
-            destacada : (req.body.destacada=="on")
+            destacada : (req.body.destacada==="on")
         }
         let mensaje=validacionAgregarOferta(oferta);
-        if(mensaje=="") {
+        if(mensaje==="") {
             gestorBD.insertarOferta(oferta, function(id){
                 if (id == null) {
                     let respuestaError = swig.renderFile('views/error.html',
@@ -378,7 +386,7 @@ module.exports = function(app,swig,gestorBD) {
                         });
                     res.send(respuestaError);
                 } else {
-                    if(req.body.destacada=="on") {
+                    if(req.body.destacada==="on") {
                         let cantidad = req.session.saldo - 20;
                         req.session.saldo = cantidad;
                         let criterio = {"email": req.session.usuario};
@@ -414,7 +422,7 @@ module.exports = function(app,swig,gestorBD) {
      * @returns {boolean} Devuelve True si es el vendedor o ya esta comprada y False si no
      */
     function isVendedorOrComprada(compras, oferta, usuario) {
-        if ((oferta.vendedor) == usuario) {
+        if ((oferta.vendedor) === usuario) {
             return true;
         } else {
             for (let i = 0; i < compras.length; i++) {
@@ -424,7 +432,7 @@ module.exports = function(app,swig,gestorBD) {
             }
             return false;
         }
-    };
+    }
 
     /**
      * Comprueba que el usuario no sea el vendedor de la oferta
@@ -433,12 +441,8 @@ module.exports = function(app,swig,gestorBD) {
      * @returns {boolean} True si es el vendedor, False si no
      */
     function isVendedor(oferta, usuario) {
-        if (oferta.vendedor == usuario)
-            return true;
-        if (oferta.vendedor == usuario)
-            return true;
-        return false;
-    };
+        return oferta.vendedor === usuario;
+    }
 
     /**
      * Comprueba que el saldo del usuario sea mayor o igual que el precio de la
@@ -448,12 +452,8 @@ module.exports = function(app,swig,gestorBD) {
      * @returns {boolean} True si tiene y False si no
      */
     function suficienteSaldo(oferta, saldo) {
-        if (oferta.precio > saldo){
-            return false;
-        } else {
-            return true;
-        }
-    };
+        return oferta.precio <= saldo;
+    }
 
     /**
      * Validación para comprobar los campos a la hora de agregar una oferta
@@ -472,5 +472,5 @@ module.exports = function(app,swig,gestorBD) {
             mensaje+="El precio no puede ser negativo<br>";
         }
         return mensaje;
-    };
+    }
 };

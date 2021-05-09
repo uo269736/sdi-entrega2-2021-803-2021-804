@@ -13,10 +13,8 @@ module.exports = function(app, gestorBD) {
             email : req.body.email,
             password : seguro
         }
-        // ¿Validar nombre, genero, precio?
-
         gestorBD.obtenerUsuarios(criterio, function(usuarios){
-            if (usuarios == null || usuarios.length == 0) {
+            if (usuarios == null || usuarios.length === 0) {
                 res.status(401);    // Usuario no autorizado
                 res.json({
                     autenticado : false
@@ -86,9 +84,9 @@ module.exports = function(app, gestorBD) {
         let criterio ={"idOferta" : req.params.idOferta,"emailVendedor":req.params.emailVendedor,"emailInteresado": req.params.emailInteresado}
 
         // En este metodo tambien marcaremos los mensajes como leídos si usuario = destinatrio
-        let escritor="";
+        let escritor;
         // Para los mensajes que marcaremos como leidos, su escritor no puede ser el usuario en sesion
-        if(req.session.usuario==req.params.emailVendedor)
+        if(req.session.usuario===req.params.emailVendedor)
             escritor = req.params.emailInteresado;
         else
             escritor = req.params.emailVendedor;
@@ -199,7 +197,7 @@ module.exports = function(app, gestorBD) {
     function ofertasAjenas(ofertas, usuario){
         let ofertasAjenas=[];
         for(let i=0;i<ofertas.length;i++) {
-            if (ofertas[i].vendedor != usuario)
+            if (ofertas[i].vendedor !== usuario)
                 ofertasAjenas.push(ofertas[i]);
         }
         return ofertasAjenas;
@@ -229,9 +227,9 @@ module.exports = function(app, gestorBD) {
      */
     function existeConversacion(conversaciones,mensaje){
         for(let i=0;i<conversaciones.length;i++) {
-            if (conversaciones[i].idOferta==mensaje.idOferta &&
-                conversaciones[i].emailInteresado==mensaje.emailInteresado &&
-                conversaciones[i].emailVendedor==mensaje.emailVendedor)
+            if (conversaciones[i].idOferta===mensaje.idOferta &&
+                conversaciones[i].emailInteresado===mensaje.emailInteresado &&
+                conversaciones[i].emailVendedor===mensaje.emailVendedor)
                 return true;
         }
         return false;

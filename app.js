@@ -54,8 +54,6 @@ routerUsuarioToken.use(function(req, res, next) {
                     acceso : false,
                     error: 'Token invalido o caducado'
                 });
-                // También podríamos comprobar que intoToken.usuario existe
-                return;
 
             } else {
                 // dejamos correr la petición
@@ -112,7 +110,7 @@ routerUsuarioVendedor.use(function(req, res, next) {
     gestorBD.obtenerOfertas(
         {_id: mongo.ObjectID(id) }, function (ofertas) {
             console.log(ofertas[0]);
-            if(ofertas[0].vendedor == req.session.usuario ){
+            if(ofertas[0].vendedor === req.session.usuario ){
                 next();
             } else {
                 res.redirect("/oferta/propias");
@@ -147,7 +145,7 @@ app.use("/identificarse",routerUsuarioIniciarSesion);
 let routerUsuarioAdmin = express.Router();
 routerUsuarioAdmin.use(function(req, res, next) {
     console.log("routerUsuarioAdmin");
-    if ( req.session.rol=="admin" ) {
+    if ( req.session.rol==="admin" ) {
         // dejamos correr la petición
         next();
     } else {
@@ -165,7 +163,7 @@ app.use("/usuario/eliminar",routerUsuarioAdmin);
 let routerUsuarioEstandar = express.Router();
 routerUsuarioEstandar.use(function(req, res, next) {
     console.log("routerUsuarioEstandar");
-    if ( req.session.rol=="usuario" ) {
+    if ( req.session.rol==="usuario" ) {
         // dejamos correr la petición
         next();
     } else {
@@ -201,7 +199,7 @@ app.get('/', function (req, res) {
 })
 
 //Manejo de errores
-app.use(function (err, req, res, next){
+app.use(function (err, req, res){
     console.log("Error producido: "+ err); //mostramos es el error en cosola
     if (! res.headersSent) {
         res.status(400);
