@@ -54,28 +54,28 @@
             for (i = 0; i < conversaciones.length; i++) {
                 $( "#tablaCuerpo" ).append(
                     "<tr id="+conversaciones[i]._id+">"+
-                    "<td>"+conversaciones[i].tituloOferta+"</td>" +
-                    "<td>"+conversaciones[i].emailVendedor+"</td>" +
-                    "<td>"+conversaciones[i].emailInteresado+"</td>" +
+                    "<td class='oferta'>"+conversaciones[i].tituloOferta+"</td>" +
+                    "<td class='vendedor'>"+conversaciones[i].emailVendedor+"</td>" +
+                    "<td class='interesado'>"+conversaciones[i].emailInteresado+"</td>" +
                     "<td>"+
-                    "<button class=\"btn btn-primary\" onclick=muestraChat('"+conversaciones[i].idOferta+"','"+conversaciones[i].emailVendedor+"','"+conversaciones[i].emailInteresado+"','"+(conversaciones[i].tituloOferta).replaceAll(" ","_")+"')>Entrar al chat</button><br>"+
+                    "<button id=\"entrar-chat\" class=\"btn btn-primary\" onclick=muestraChat('"+conversaciones[i].idOferta+"','"+conversaciones[i].emailVendedor+"','"+conversaciones[i].emailInteresado+"','"+(conversaciones[i].tituloOferta).replaceAll(" ","_")+"')>Entrar al chat</button><br>"+
                     "</td>"+
-                    "<td><button class=\"btn btn-danger\" onclick=eliminarConversacion('"+conversaciones[i].idOferta+"','"+conversaciones[i].emailInteresado+"')>Borrar Conversación</button></td>"+
+                    "<td><button id=\"borrar-conversacion\"class=\"btn btn-danger\" onclick=eliminarConversacion('"+conversaciones[i].idOferta+"','"+conversaciones[i].emailInteresado+"')>Borrar Conversación</button></td>"+
                     "</tr>" );
             }
     }
     cargarConversaciones();
 
     $('#filtro-titulo').on('input',function(e){
-        var ofertasFiltradas = [];
+        var conversacionesFiltradas = [];
         var tituloFiltro = $("#filtro-titulo").val();
 
-        for (i = 0; i < ofertas.length; i++) {
-            if (ofertas[i].titulo.toLowerCase().indexOf(tituloFiltro.toLowerCase()) != -1 ){
-                ofertasFiltradas.push(ofertas[i]);
+        for (i = 0; i < conversaciones.length; i++) {
+            if (conversaciones[i].tituloOferta.toLowerCase().indexOf(tituloFiltro.toLowerCase()) != -1 ){
+                conversacionesFiltradas.push(conversaciones[i]);
             }
         }
-        actualizarTabla(ofertasFiltradas);
+        actualizarTabla(conversacionesFiltradas);
     });
 
     var tituloDsc = false;
@@ -85,21 +85,21 @@
      */
     function ordenarPorTitulo() {
         if (tituloDsc) {
-            ofertas.sort(function (a, b) {
-                if (a.titulo > b.titulo) return 1;
-                if (a.titulo < b.titulo) return -1;
+            conversaciones.sort(function (a, b) {
+                if (a.tituloOferta > b.tituloOferta) return 1;
+                if (a.tituloOferta < b.tituloOferta) return -1;
                 return 0;
             });
         }
         else
         {
-            ofertas.sort(function (a, b) {
-                if (b.titulo > a.titulo) return 1;
-                if (b.titulo < a.titulo) return -1;
+            conversaciones.sort(function (a, b) {
+                if (b.tituloOferta > a.tituloOferta) return 1;
+                if (b.tituloOferta < a.tituloOferta) return -1;
                 return 0;
             });
         }
-        actualizarTabla(ofertas);
+        actualizarTabla(conversaciones);
 
         tituloDsc = !tituloDsc; //invertir
     }

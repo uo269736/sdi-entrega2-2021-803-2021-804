@@ -2,13 +2,14 @@ package com.uniovi.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 //Paquetes Java
 import java.util.List;
 
-import org.bson.BsonBoolean;
-import org.bson.conversions.Bson;
+import org.bson.Document;
+import org.bson.json.JsonReader;
 //Paquetes JUnit 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -17,27 +18,20 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-//Paquetes Selenium 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.seleniumhq.jetty9.server.Authentication.User;
 
-import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.util.JSON;
+import com.uniovi.tests.pageobjects.PO_Chat;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
-import com.uniovi.tests.pageobjects.PO_OfertaAddView;
-import com.uniovi.tests.pageobjects.PO_OfertaUserList;
-import com.uniovi.tests.pageobjects.PO_OfertasCompradasListView;
-import com.uniovi.tests.pageobjects.PO_Properties;
+import com.uniovi.tests.pageobjects.PO_OfertasView;
 import com.uniovi.tests.pageobjects.PO_RegisterView;
-import com.uniovi.tests.pageobjects.PO_UserListView;
 import com.uniovi.tests.pageobjects.PO_View;
 //Paquetes Utilidades de Testing Propias
 import com.uniovi.tests.util.SeleniumUtils;
@@ -101,176 +95,176 @@ public class SdiEntrega2Tests {
     }
 
 	// [Prueba1] Registro de Usuario con datos válidos.
-		@Test
-		public void Prueba01() {
-			// Vamos al formulario de registro
-			PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
-			// Rellenamos el formulario.
-			PO_RegisterView.fillForm(driver, "b@email.com", "Josefo", "Perez", "123456", "123456");
-			// Comprobamos que entramos en la sección privada
-			PO_View.checkElement(driver, "text", "b@email.com");
-		}
+	@Test
+	public void Prueba01() {
+		// Vamos al formulario de registro
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_RegisterView.fillForm(driver, "b@email.com", "Josefo", "Perez", "123456", "123456");
+		// Comprobamos que entramos en la sección privada
+		PO_View.checkElement(driver, "text", "b@email.com");
+	}
 
-		// [Prueba2] Registro de Usuario con datos inválidos (email vacío, nombre vacío,
-		// apellidos vacíos).
-		@Test
-		public void Prueba02() {
-			// Vamos al formulario de registro
-			PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
-			// Rellenamos el formulario.
-			PO_RegisterView.fillForm(driver, "", "", "", "123456", "123456");
-			// Comprobamos que no cambiamos de página y que no sale mensaje de error
-			SeleniumUtils.textoPresentePagina(driver, "Registrar usuario");
-			SeleniumUtils.textoNoPresentePagina(driver, "debe");
-		}
+	// [Prueba2] Registro de Usuario con datos inválidos (email vacío, nombre vacío,
+	// apellidos vacíos).
+	@Test
+	public void Prueba02() {
+		// Vamos al formulario de registro
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_RegisterView.fillForm(driver, "", "", "", "123456", "123456");
+		// Comprobamos que no cambiamos de página y que no sale mensaje de error
+		SeleniumUtils.textoPresentePagina(driver, "Registrar usuario");
+		SeleniumUtils.textoNoPresentePagina(driver, "debe");
+	}
 
-		// [Prueba3] Registro de Usuario con datos inválidos (repetición de contraseña
-		// inválida).
-		@Test
-		public void Prueba03() {
-			// Vamos al formulario de registro
-			PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
-			// Rellenamos el formulario.
-			PO_RegisterView.fillForm(driver, "a@email.com", "Josefo", "Perez", "123456", "456789");
-			// Comprobamos que no cambiamos de página y que sale el mensaje de error de las
-			// contraseñas
-			SeleniumUtils.textoPresentePagina(driver, "Las contraseñas deben ser iguales");
+	// [Prueba3] Registro de Usuario con datos inválidos (repetición de contraseña
+	// inválida).
+	@Test
+	public void Prueba03() {
+		// Vamos al formulario de registro
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_RegisterView.fillForm(driver, "a@email.com", "Josefo", "Perez", "123456", "456789");
+		// Comprobamos que no cambiamos de página y que sale el mensaje de error de las
+		// contraseñas
+		SeleniumUtils.textoPresentePagina(driver, "Las contraseñas deben ser iguales");
 
-		}
+	}
 
-		// [Prueba4] Registro de Usuario con datos inválidos (email existente).
-		@Test
-		public void Prueba04() {
-			// Vamos al formulario de registro
-			PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
-			// Rellenamos el formulario.
-			PO_RegisterView.fillForm(driver, "admin@email.com", "Josefo", "Perez", "123456", "456");
-			// Comprobamos que no cambiamos de página y que sale el mensaje de error de las
-			// contraseñas
-			SeleniumUtils.textoPresentePagina(driver, "Este email ya está en uso");
-		}
+	// [Prueba4] Registro de Usuario con datos inválidos (email existente).
+	@Test
+	public void Prueba04() {
+		// Vamos al formulario de registro
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_RegisterView.fillForm(driver, "admin@email.com", "Josefo", "Perez", "123456", "456");
+		// Comprobamos que no cambiamos de página y que sale el mensaje de error de las
+		// contraseñas
+		SeleniumUtils.textoPresentePagina(driver, "Este email ya está en uso");
+	}
 
-		// [Prueba5] Inicio de sesión con datos válidos (administrador).
-		@Test
-		public void Prueba05() {
-			// Vamos al formulario de logueo.
-			PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
-			// Rellenamos el formulario
-			PO_LoginView.fillForm(driver, "admin@email.com", "admin");
-			// Comprobamos que entramos en la pagina privada del Admin
-			PO_View.checkElement(driver, "text", "admin@email.com");
-			SeleniumUtils.textoPresentePagina(driver, "Gestion de Usuarios");
-		}
+	// [Prueba5] Inicio de sesión con datos válidos (administrador).
+	@Test
+	public void Prueba05() {
+		// Vamos al formulario de logueo.
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Rellenamos el formulario
+		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
+		// Comprobamos que entramos en la pagina privada del Admin
+		PO_View.checkElement(driver, "text", "admin@email.com");
+		SeleniumUtils.textoPresentePagina(driver, "Gestion de Usuarios");
+	}
 
-		// [Prueba5b] Inicio de sesión con datos válidos (usuario estándar).
-		@Test
-		public void Prueba05b() {
-			// Vamos al formulario de logueo.
-			PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
-			// Rellenamos el formulario
-			PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
-			// Comprobamos que entramos en la pagina privada del Usuario Estandar
-			PO_View.checkElement(driver, "text", "prueba@uniovi.es");
-			PO_View.checkElement(driver, "text", "Gestion de Ofertas");
-			SeleniumUtils.textoNoPresentePagina(driver, "Gestion de Usuarios");
-		}
+	// [Prueba5b] Inicio de sesión con datos válidos (usuario estándar).
+	@Test
+	public void Prueba05b() {
+		// Vamos al formulario de logueo.
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Rellenamos el formulario
+		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
+		// Comprobamos que entramos en la pagina privada del Usuario Estandar
+		PO_View.checkElement(driver, "text", "prueba@uniovi.es");
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas");
+		SeleniumUtils.textoNoPresentePagina(driver, "Gestion de Usuarios");
+	}
 
-		// [Prueba6] Inicio de sesión con datos inválidos (usuario estándar, email
-		// existente, pero contraseña
-		// incorrecta).
-		@Test
-		public void Prueba06() {
-			// Vamos al formulario de logueo.
-			PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
-			// Rellenamos el formulario
-			PO_LoginView.fillForm(driver, "prueba@uniovi.es", "111111");
-			// Comprobamos que nos sale el error de contraseña o usuario incorrecto
-			SeleniumUtils.textoPresentePagina(driver, "Email o password incorrecto");
-		}
+	// [Prueba6] Inicio de sesión con datos inválidos (usuario estándar, email
+	// existente, pero contraseña
+	// incorrecta).
+	@Test
+	public void Prueba06() {
+		// Vamos al formulario de logueo.
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Rellenamos el formulario
+		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "111111");
+		// Comprobamos que nos sale el error de contraseña o usuario incorrecto
+		SeleniumUtils.textoPresentePagina(driver, "Email o password incorrecto");
+	}
 
-		// [Prueba7] Inicio de sesión con datos inválidos (usuario estándar, campo email
-		// y contraseña vacíos).
-		@Test
-		public void Prueba07() {
-			// Vamos al formulario de logueo.
-			PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
-			// Rellenamos el formulario
-			PO_LoginView.fillForm(driver, "", "");
-			// Comprobamos que no nos movemos y que no sale ningún error
-			PO_View.checkElement(driver, "text", "Identifícate");
-			PO_View.checkElement(driver, "text", "Email");
-			SeleniumUtils.textoNoPresentePagina(driver, "Desconectar");
-		}
+	// [Prueba7] Inicio de sesión con datos inválidos (usuario estándar, campo email
+	// y contraseña vacíos).
+	@Test
+	public void Prueba07() {
+		// Vamos al formulario de logueo.
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Rellenamos el formulario
+		PO_LoginView.fillForm(driver, "", "");
+		// Comprobamos que no nos movemos y que no sale ningún error
+		PO_View.checkElement(driver, "text", "Identifícate");
+		PO_View.checkElement(driver, "text", "Email");
+		SeleniumUtils.textoNoPresentePagina(driver, "Desconectar");
+	}
 
-		// [Prueba8] Inicio de sesión con datos inválidos (usuario estándar, email no
-		// existente en la aplicación).
-		@Test
-		public void Prueba08() {
-			// Vamos al formulario de logueo.
-			PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
-			// Rellenamos el formulario
-			PO_LoginView.fillForm(driver, "123@email.com", "111111");
-			// Comprobamos que nos sale el error de contraseña o usuario incorrecto
-			SeleniumUtils.textoPresentePagina(driver, "Email o password incorrecto");
-		}
+	// [Prueba8] Inicio de sesión con datos inválidos (usuario estándar, email no
+	// existente en la aplicación).
+	@Test
+	public void Prueba08() {
+		// Vamos al formulario de logueo.
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Rellenamos el formulario
+		PO_LoginView.fillForm(driver, "123@email.com", "111111");
+		// Comprobamos que nos sale el error de contraseña o usuario incorrecto
+		SeleniumUtils.textoPresentePagina(driver, "Email o password incorrecto");
+	}
 
-		// [Prueba10] Hacer click en la opción de salir de sesión y comprobar que se
-		// redirige a la página de inicio
-		// de sesión (Login).
-		@Test
-		public void Prueba09() {
-			// Vamos al formulario de logueo.
-			PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
-			// Rellenamos el formulario
-			PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
-			// Comprobamos que entramos en la pagina privada del Usuario Estandar
-			PO_View.checkElement(driver, "text", "prueba@uniovi.es");
-			PO_View.checkElement(driver, "text", "Gestion de Ofertas");
-			SeleniumUtils.textoNoPresentePagina(driver, "Gestión de Usuarios");
-			// Ahora nos desconectamos
-			PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
-			// Comprobamos que sale la página de inicar sesión
-			SeleniumUtils.textoPresentePagina(driver, "Identifícate");
-			SeleniumUtils.textoPresentePagina(driver, "Email:");
-		}
+	// [Prueba10] Hacer click en la opción de salir de sesión y comprobar que se
+	// redirige a la página de inicio
+	// de sesión (Login).
+	@Test
+	public void Prueba09() {
+		// Vamos al formulario de logueo.
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Rellenamos el formulario
+		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
+		// Comprobamos que entramos en la pagina privada del Usuario Estandar
+		PO_View.checkElement(driver, "text", "prueba@uniovi.es");
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas");
+		SeleniumUtils.textoNoPresentePagina(driver, "Gestión de Usuarios");
+		// Ahora nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		// Comprobamos que sale la página de inicar sesión
+		SeleniumUtils.textoPresentePagina(driver, "Identifícate");
+		SeleniumUtils.textoPresentePagina(driver, "Email:");
+	}
 
-		// [Prueba10] Comprobar que el botón cerrar sesión no está visible si el usuario
-		// no está autenticado
-		@Test
-		public void Prueba10() {
-			// Vamos al formulario de logueo.
-			PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
-			// Probamos si esta el botón desconectar antes de entrar
-			SeleniumUtils.textoNoPresentePagina(driver, "Desconectarse");
-			// Rellenamos el formulario
-			PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
-			// Comprobamos que entramos en la pagina privada del Usuario Estandar
-			PO_View.checkElement(driver, "text", "prueba@uniovi.es");
-			PO_View.checkElement(driver, "text", "Gestion de Ofertas");
-			SeleniumUtils.textoNoPresentePagina(driver, "Gestión de Usuarios");
-			// Ahora nos desconectamos
-			PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
-			// Ahora tras desconectarnos comprobamos si esta el botón desconectarse
-			SeleniumUtils.textoNoPresentePagina(driver, "Desconectarse");
-		}
+	// [Prueba10] Comprobar que el botón cerrar sesión no está visible si el usuario
+	// no está autenticado
+	@Test
+	public void Prueba10() {
+		// Vamos al formulario de logueo.
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Probamos si esta el botón desconectar antes de entrar
+		SeleniumUtils.textoNoPresentePagina(driver, "Desconectarse");
+		// Rellenamos el formulario
+		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
+		// Comprobamos que entramos en la pagina privada del Usuario Estandar
+		PO_View.checkElement(driver, "text", "prueba@uniovi.es");
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas");
+		SeleniumUtils.textoNoPresentePagina(driver, "Gestión de Usuarios");
+		// Ahora nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		// Ahora tras desconectarnos comprobamos si esta el botón desconectarse
+		SeleniumUtils.textoNoPresentePagina(driver, "Desconectarse");
+	}
 
-//		// [Prueba11] Mostrar el listado de usuarios y comprobar que se muestran todos
-//		// los que existen en el sistema.
-//		@Test
-//		public void Prueba11() {
-//			// Vamos al formulario de logueo.
-//			PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
-//			// Rellenamos el formulario
-//			PO_LoginView.fillForm(driver, "admin@email.com", "admin");
-//			// Pinchamos en la opción de menu de Usuarios: //li[contains(@id,
-//			// 'gestionUsuarios')]/a
-//			List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'gestionUsuarios')]/a");
-//			elementos.get(0).click();
-//			// Pinchamos en la opción de lista de usuarios.
-//			elementos = PO_View.checkElement(driver, "free", "//a[contains(@href,'/usuario/list')]");
-//			elementos.get(0).click();
-//			PO_UserListView.checkAllUsers(driver,database.getCollection("usuarios").count());
-//		}
+//	// [Prueba11] Mostrar el listado de usuarios y comprobar que se muestran todos
+//	// los que existen en el sistema.
+//	@Test
+//	public void Prueba11() {
+//		// Vamos al formulario de logueo.
+//		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+//		// Rellenamos el formulario
+//		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
+//		// Pinchamos en la opción de menu de Usuarios: //li[contains(@id,
+//		// 'gestionUsuarios')]/a
+//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'gestionUsuarios')]/a");
+//		elementos.get(0).click();
+//		// Pinchamos en la opción de lista de usuarios.
+//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href,'/usuario/list')]");
+//		elementos.get(0).click();
+//		PO_UserListView.checkAllUsers(driver,database.getCollection("usuarios").count());
+//	}
 //
 //	// [Prueba12] Ir a la lista de usuarios, borrar el primer usuario de la lista,
 //	// comprobar que la lista se actualiza y que el usuario desaparece.
@@ -889,7 +883,6 @@ public class SdiEntrega2Tests {
 	// contraseña incorrecta).
 	@Test
 	public void Prueba31() {
-		// Intentamos acceder a lista de usuarios sin identificarnos
 		driver.navigate().to("https://localhost:8081/cliente.html");
 		// Comprobamos que vamos a la vista de iniciar sesión
 		SeleniumUtils.textoPresentePagina(driver, "Password:");
@@ -906,7 +899,6 @@ public class SdiEntrega2Tests {
 	// vacíos)
 	@Test
 	public void Prueba32() {
-		// Intentamos acceder a lista de usuarios sin identificarnos
 		driver.navigate().to("https://localhost:8081/cliente.html");
 		// Comprobamos que vamos a la vista de iniciar sesión
 		SeleniumUtils.textoPresentePagina(driver, "Password:");
@@ -925,7 +917,6 @@ public class SdiEntrega2Tests {
 	// existen, menos las del usuario identificado.
 	@Test
 	public void Prueba33() {
-		// Intentamos acceder a lista de usuarios sin identificarnos
 		driver.navigate().to("https://localhost:8081/cliente.html");
 		// Comprobamos que vamos a la vista de iniciar sesión
 		SeleniumUtils.textoPresentePagina(driver, "Password:");
@@ -939,11 +930,7 @@ public class SdiEntrega2Tests {
 		
 		for(WebElement w : vendedores){
 			assertNotEquals(w.getText(), "prueba@uniovi.es");
-		}
-		
-		//Bson b = (Bson) JSON.parse("{titulo: 'Manzanas'}");
-		//System.out.println(database.getCollection("ofertas").find().filter(b).first().toString());
-		
+		}		
 	}
 
 	// [Prueba34] Sobre una búsqueda determinada de ofertas (a elección de
@@ -952,88 +939,191 @@ public class SdiEntrega2Tests {
 	// Comprobar que el mensaje aparece en el listado de mensajes.
 	@Test
 	public void Prueba34() {
-		// Intentamos acceder a lista de usuarios sin identificarnos
 		driver.navigate().to("https://localhost:8081/cliente.html");
-		// Comprobamos que vamos a la vista de iniciar sesión
-		SeleniumUtils.textoPresentePagina(driver, "Password:");
-		SeleniumUtils.textoPresentePagina(driver, "Email:");
 		
 		// Iniciamos sesion
 		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
+		//Buscamos 1 oferta concreta
+		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.com");
+		//Vamos al chat
+		PO_View.checkElement(driver, "id", "hablarConVendedor").get(0).click();
+		//Enviamos un mensaje y comprobamos que se envía
+		PO_Chat.send(driver, "Prueba34");
+		PO_View.checkElement(driver, "text", "Prueba34");
+		
+		// Vamos a conversaciones
+		PO_View.checkElement(driver, "id", "btn-volver").get(0).click();
+		PO_View.checkElement(driver, "id", "conversaciones").get(0).click();
+		// Comprobamos que la conversacion existe
+		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.com");
+
+		// Entramos al chat
+		PO_View.checkElement(driver, "id", "entrar-chat").get(0).click();
+		PO_View.checkElement(driver, "text", "Película australiana");
+		// Comprobamos que el mensaje enviado existe
+		PO_View.checkElement(driver, "text", "Prueba34");
 	}
 
-//	// [Prueba35] Sobre el listado de conversaciones enviar un mensaje a una conversación ya abierta.
-//	// Comprobar que el mensaje aparece en el listado de mensajes.
-//	@Test
-//	public void Prueba35() {
-//		// Vamos al formulario de logueo.
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario
-//		PO_LoginView.fillForm(driver, "UO101010@uniovi.es", "123456");
-//		// Intentamos acceder a lista de usuarios identificados como usuario estandar
-//		driver.navigate().to("http://localhost:8080/user/list");
-//		// Comprobamos que aparece el texto que nos prohibe entrar
-//		SeleniumUtils.textoPresentePagina(driver, "HTTP Status 403 – Forbidden");
-//	}
-//
-//	// [Prueba36] Mostrar el listado de conversaciones ya abiertas. Comprobar que el listado contiene las
-//	// conversaciones que deben ser
-//	@Test
-//	public void Prueba36() {
-//		// Vamos al formulario de logueo.
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario
-//		PO_LoginView.fillForm(driver, "UO101010@uniovi.es", "123456");
-//		// Intentamos acceder a lista de usuarios identificados como usuario estandar
-//		driver.navigate().to("http://localhost:8080/user/list");
-//		// Comprobamos que aparece el texto que nos prohibe entrar
-//		SeleniumUtils.textoPresentePagina(driver, "HTTP Status 403 – Forbidden");
-//	}
-//
-//	// [Prueba37] Sobre el listado de conversaciones ya abiertas. Pinchar el enlace Eliminar de la primera y
-//	// comprobar que el listado se actualiza correctamente
-//	@Test
-//	public void Prueba37() {
-//		// Vamos al formulario de logueo.
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario
-//		PO_LoginView.fillForm(driver, "UO101010@uniovi.es", "123456");
-//		// Intentamos acceder a lista de usuarios identificados como usuario estandar
-//		driver.navigate().to("http://localhost:8080/user/list");
-//		// Comprobamos que aparece el texto que nos prohibe entrar
-//		SeleniumUtils.textoPresentePagina(driver, "HTTP Status 403 – Forbidden");
-//	}
-//
-//	// [Prueba38] Sobre el listado de conversaciones ya abiertas. Pinchar el enlace Eliminar de la última y
-//	// comprobar que el listado se actualiza correctamente
-//	@Test
-//	public void Prueba38() {
-//		// Vamos al formulario de logueo.
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario
-//		PO_LoginView.fillForm(driver, "UO101010@uniovi.es", "123456");
-//		// Intentamos acceder a lista de usuarios identificados como usuario estandar
-//		driver.navigate().to("http://localhost:8080/user/list");
-//		// Comprobamos que aparece el texto que nos prohibe entrar
-//		SeleniumUtils.textoPresentePagina(driver, "HTTP Status 403 – Forbidden");
-//	}
-//
-//	// [Prueba39] Identificarse en la aplicación y enviar un mensaje a una oferta, validar que el mensaje
-//	// enviado aparece en el chat. Identificarse después con el usuario propietario de la oferta y validar
-//	// que tiene un mensaje sin leer, entrar en el chat y comprobar que el mensaje pasa a tener el estado
-//	// leído.
-//	@Test
-//	public void Prueba39() {
-//		// Vamos al formulario de logueo.
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario
-//		PO_LoginView.fillForm(driver, "UO101010@uniovi.es", "123456");
-//		// Intentamos acceder a lista de usuarios identificados como usuario estandar
-//		driver.navigate().to("http://localhost:8080/user/list");
-//		// Comprobamos que aparece el texto que nos prohibe entrar
-//		SeleniumUtils.textoPresentePagina(driver, "HTTP Status 403 – Forbidden");
-//	}
-//
+	// [Prueba35] Sobre el listado de conversaciones enviar un mensaje a una conversación ya abierta.
+	// Comprobar que el mensaje aparece en el listado de mensajes.
+	@Test
+	public void Prueba35() {
+		driver.navigate().to("https://localhost:8081/cliente.html");
+		
+		// Iniciamos sesion
+		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
+		//Buscamos 1 oferta concreta
+		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.com");
+		//Vamos al chat
+		PO_View.checkElement(driver, "id", "hablarConVendedor").get(0).click();
+		//Enviamos un mensaje para asegurarnos de que la conversacion existe
+		PO_Chat.send(driver, "Prueba35-1");
+		
+		// Vamos a conversaciones
+		PO_View.checkElement(driver, "id", "btn-volver").get(0).click();
+		PO_View.checkElement(driver, "id", "conversaciones").get(0).click();
+		// Comprobamos que la conversacion existe
+		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.com");
+
+		// Entramos al chat
+		PO_View.checkElement(driver, "id", "entrar-chat").get(0).click();
+		//Enviamos un mensaje en la conversacion ya creada
+		PO_Chat.send(driver, "Prueba35-2");
+		
+		// Volvemos a conversaciones
+		PO_View.checkElement(driver, "id", "btn-volver").get(0).click();
+		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.com");
+		// Entramos al chat
+		PO_View.checkElement(driver, "id", "entrar-chat").get(0).click();
+		// Dejamos que cargue el chat
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "probando@uniovi.com", 3);	// Destinatario de los mensajes
+		// Comprobamos que el mensaje enviado existe
+		PO_View.checkElement(driver, "text", "Prueba35-2");
+	}
+
+	// [Prueba36] Mostrar el listado de conversaciones ya abiertas. Comprobar que el listado contiene las
+	// conversaciones que deben ser
+	@Test
+	public void Prueba36() {
+		driver.navigate().to("https://localhost:8081/cliente.html");
+		String usuario = "prueba@uniovi.es";
+		// Iniciamos sesion
+		PO_LoginView.fillForm(driver, usuario, "123456");
+		
+		// Vamos a conversaciones
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "Titulo", 3);
+		PO_View.checkElement(driver, "id", "conversaciones").get(0).click();
+		
+		// Obtenemos las conversaciones
+		List<WebElement> vendedores = PO_View.checkElement(driver, "class", "vendedor");
+		List<WebElement> interesados = PO_View.checkElement(driver, "class", "interesado");
+		List<String> emails = new ArrayList<String>();
+		
+		// Comprobamos que son coherentes con la base de datos		
+		MongoCollection<Document> mensajes = database.getCollection("mensajes");
+		for(int i=0; i<vendedores.size(); i++) {
+			emails.add(vendedores.get(i).getText());
+			emails.add(interesados.get(i).getText());
+		}
+		for(Document d : mensajes.find()) {
+			if(d.get("emailVendedor").equals(usuario))
+				assertTrue(emails.contains(d.get("emailInteresado")));
+			else if(d.get("emailInteresado").equals(usuario))
+				assertTrue(emails.contains(d.get("emailVendedor")));
+		}
+	}
+
+	// [Prueba37] Sobre el listado de conversaciones ya abiertas. Pinchar el enlace Eliminar de la primera y
+	// comprobar que el listado se actualiza correctamente
+	@Test
+	public void Prueba37() {
+		driver.navigate().to("https://localhost:8081/cliente.html");
+		String usuario = "prueba@uniovi.es";
+		// Iniciamos sesion
+		PO_LoginView.fillForm(driver, usuario, "123456");
+		//Vamos al chat a crear 2 conversaciones (para evitar errores)
+		PO_View.checkElement(driver, "id", "hablarConVendedor").get(0).click();
+		//Enviamos los 2 mensajes
+		PO_Chat.send(driver, "Prueba37");
+		PO_View.checkElement(driver, "id", "ofertas").get(0).click();
+		PO_View.checkElement(driver, "id", "hablarConVendedor").get(1).click();
+		PO_Chat.send(driver, "Prueba37");
+		
+		// Vamos a conversaciones
+		PO_View.checkElement(driver, "id", "btn-volver").get(0).click();
+		
+		//Clickamos en el primer eliminar conversacion si es que existe
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "Titulo de la oferta", 2);
+		List<WebElement> conversacionesOriginal = PO_View.checkElement(driver, "class", "oferta");
+		List<WebElement> btn = PO_View.checkElement(driver, "id", "borrar-conversacion");
+		
+		btn.get(1).click();
+		// Comprobamos que la conversacion desaparece
+		SeleniumUtils.EsperaCargaPaginaNoTexto(driver, conversacionesOriginal.get(1).getText(), 4);
+	}
+
+	// [Prueba38] Sobre el listado de conversaciones ya abiertas. Pinchar el enlace Eliminar de la última y
+	// comprobar que el listado se actualiza correctamente
+	@Test
+	public void Prueba38() {
+		driver.navigate().to("https://localhost:8081/cliente.html");
+		String usuario = "prueba@uniovi.es";
+		// Iniciamos sesion
+		PO_LoginView.fillForm(driver, usuario, "123456");
+		//Vamos al chat a crear 1 conversacion para evitar errores
+		PO_View.checkElement(driver, "id", "hablarConVendedor").get(0).click();
+		PO_Chat.send(driver, "Prueba38");
+		
+		// Vamos a conversaciones
+		PO_View.checkElement(driver, "id", "btn-volver").get(0).click();
+		
+		//Clickamos en el primer eliminar conversacion si es que existe
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "Titulo de la oferta", 2);
+		List<WebElement> conversaciones = PO_View.checkElement(driver, "class", "oferta");
+		List<WebElement> btn = PO_View.checkElement(driver, "id", "borrar-conversacion");
+		
+		//Borramos la ultima conversacion
+		btn.get(btn.size()-1).click();
+		// Comprobamos que la conversacion desaparece
+		SeleniumUtils.EsperaCargaPaginaNoTexto(driver, conversaciones.get(btn.size()-1).getText(), 4);
+	}
+
+	// [Prueba39] Identificarse en la aplicación y enviar un mensaje a una oferta, validar que el mensaje
+	// enviado aparece en el chat. Identificarse después con el usuario propietario de la oferta y validar
+	// que tiene un mensaje sin leer, entrar en el chat y comprobar que el mensaje pasa a tener el estado
+	// leído.
+	@Test
+	public void Prueba39() {
+		driver.navigate().to("https://localhost:8081/cliente.html");
+		
+		// Iniciamos sesion
+		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
+		//Buscamos 1 oferta concreta
+		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.com");
+		//Vamos al chat
+		PO_View.checkElement(driver, "id", "hablarConVendedor").get(0).click();
+		//Enviamos un mensaje y comprobamos que se envía y que se marca como no leido
+		PO_Chat.send(driver, "Prueba39");
+		PO_View.checkElement(driver, "text", "Prueba39");
+		PO_View.checkElement(driver, "text", "No leido");
+		
+		// Iniciamos sesion con el destinatario del mensaje
+		driver.navigate().to("https://localhost:8081/cliente.html");
+		PO_LoginView.fillForm(driver, "probando@uniovi.es", "12345");
+		// Vamos a conversaciones
+		PO_View.checkElement(driver, "id", "conversaciones").get(0).click();
+		// Comprobamos que la conversacion existe
+		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.com");
+
+		// Entramos al chat
+		PO_View.checkElement(driver, "id", "entrar-chat").get(0).click();
+		// Comprobamos que ahora el mensaje esta leido
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "Película australiana", 2);
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "Prueba39", 2);
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "Leido", 2);
+		
+	}
+
 //	// [Prueba40] Identificarse en la aplicación y enviar tres mensajes a una oferta, validar que los mensajes
 //	// enviados aparecen en el chat. Identificarse después con el usuario propietario de la oferta y
 //	// validar que el número de mensajes sin leer aparece en su oferta.
