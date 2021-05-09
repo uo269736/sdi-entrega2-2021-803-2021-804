@@ -15,6 +15,7 @@ module.exports = function(app, gestorBD) {
         }
         gestorBD.obtenerUsuarios(criterio, function(usuarios){
             if (usuarios == null || usuarios.length === 0) {
+                app.get("logger").info("[API] ERROR: No se ha podido acceder");
                 res.status(401);    // Usuario no autorizado
                 res.json({
                     autenticado : false
@@ -24,6 +25,7 @@ module.exports = function(app, gestorBD) {
                     {usuario: criterio.email , tiempo: Date.now()/1000},
                     "secreto");
                 req.session.usuario=criterio.email;
+                app.get("logger").info("[API] El usuario "+req.session.usuario+" ha iniciado sesión con éxito" );
                 res.status(200);
                 res.json({
                     autenticado : true,
@@ -43,11 +45,13 @@ module.exports = function(app, gestorBD) {
         gestorBD.obtenerOfertas({} , function(ofertas) {
             if (ofertas == null) {
                 res.status(500);
+                app.get("logger").info("[API] ERROR: El usuario "+req.session.usuario+" no ha podido listar las ofertas");
                 res.json({
                     error : "se ha producido un error"
                 })
             } else {
                 let ofertasA=ofertasAjenas(ofertas,req.session.usuario)
+                app.get("logger").info("[API] El usuario "+req.session.usuario+" ha accedido correctamente a la lista de ofertas");
                 res.status(200);
                 res.send( JSON.stringify(ofertasA) );
             }
@@ -63,11 +67,13 @@ module.exports = function(app, gestorBD) {
         let criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id)}
         gestorBD.obtenerOfertas(criterio,function(ofertas){
             if ( ofertas == null ){
+                app.get("logger").info("[API] ERROR: El usuario "+req.session.usuario+" tuvo un error al acceder a los detalles de la oferta con id "+req.params.id);
                 res.status(500);
                 res.json({
                     error : "se ha producido un error"
                 })
             } else {
+                app.get("logger").info("[API] El usuario "+req.session.usuario+" ha accedido correctamente a los detalles de la oferta con id "+req.params.id);
                 res.status(200);
                 res.send( JSON.stringify(ofertas[0]) );
             }
@@ -94,6 +100,7 @@ module.exports = function(app, gestorBD) {
         // Comprobamos si tenemos mensajes que marcar como vistos
         gestorBD.marcarComoLeido(criterioMarcarLeido, function (result){
             if(result == null) {
+                app.get("logger").info("[API] ERROR: El usuario "+req.session.usuario+" no ha podido marcar como leido un mensaje de la oferta con id "+req.params.idOferta);
                 res.status(500);
                 res.json({
                     error: "se ha producido un error"
@@ -101,11 +108,13 @@ module.exports = function(app, gestorBD) {
             }else {
                 gestorBD.obtenerMensajes(criterio, function (mensajes) {
                     if (mensajes == null) {
+                        app.get("logger").info("[API] ERROR: El usuario "+req.session.usuario+" no ha podido obtener los mensajes de la oferta con id "+req.params.idOferta);
                         res.status(500);
                         res.json({
                             error: "se ha producido un error"
                         })
                     } else {
+                        app.get("logger").info("[API] El usuario "+req.session.usuario+" ha accedido correctamente a chat de la oferta con id "+req.params.idOferta);
                         res.status(200);
                         res.send(JSON.stringify(mensajes));
                     }
@@ -135,11 +144,13 @@ module.exports = function(app, gestorBD) {
         }
         gestorBD.insertarMensaje(mensaje, function(mensajes){
             if (mensajes == null) {
+                app.get("logger").info("[API] ERROR: El usuario "+req.session.usuario+" no ha podido insertar el mensaje con texto "+req.body.mensaje);
                 res.status(401);    // Usuario no autorizado
                 res.json({
                     error : "se ha producido un error"
                 })
             } else {
+                app.get("logger").info("[API] El usuario "+req.session.usuario+" ha insertado con éxito el mensaje con texto "+req.body.mensaje);
                 res.status(200);
                 res.json(JSON.stringify(mensaje))
             }
@@ -156,11 +167,13 @@ module.exports = function(app, gestorBD) {
         let criterio = {"idOferta" : req.params.idOferta,"emailInteresado": req.params.emailInteresado} // Criterio para borrar toda la conversacion
         gestorBD.eliminarMensaje(criterio, function(mensajes){
             if (mensajes == null) {
+                app.get("logger").info("[API] El usuario "+req.session.usuario+" ha borrado los mensajes de la conversacion de la oferta con id "+req.params.idOferta);
                 res.status(500);
                 res.json({
                     error : "se ha producido un error"
                 })
             } else {
+                app.get("logger").info("[API] El usuario "+req.session.usuario+" ha insertado con éxito el mensaje con texto "+req.body.mensaje);
                 res.status(200);
                 res.json(JSON.stringify(mensajes))
             }
@@ -176,12 +189,14 @@ module.exports = function(app, gestorBD) {
         let criterio = {$or: [{"emailVendedor":req.session.usuario},{"emailInteresado":req.session.usuario}]};
         gestorBD.obtenerMensajes(criterio , function(mensajes) {
             if (mensajes == null) {
+                app.get("logger").info("[API] ERROR: El usuario "+req.session.usuario+" no ha podido cargar sus conversaciones");
                 res.status(500);
                 res.json({
                     error : "se ha producido un error"
                 })
             } else {
                 let conversaciones=obtenerConversaciones(mensajes)
+                app.get("logger").info("[API] El usuario "+req.session.usuario+" ha cargado con éxito todas sus conversaciones");
                 res.status(200);
                 res.send( JSON.stringify(conversaciones) );
             }
