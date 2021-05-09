@@ -1,5 +1,11 @@
 module.exports = function(app, swig, gestorBD) {
 
+    /**
+     * /usuario/list
+     *
+     * Muestra la lista de usuario del sistema, carga la vista. Es solo accesible
+     * para el administrador
+     */
     app.get("/usuario/list", function(req, res) {
         gestorBD.obtenerUsuarios({},function(usuarios, total ) {
             if (usuarios == null) {
@@ -24,6 +30,11 @@ module.exports = function(app, swig, gestorBD) {
         });
     });
 
+    /**
+     * /usuario/eliminar
+     *
+     * Elimina los usuarios seleccionados por el administrador
+     */
     app.post('/usuario/eliminar', function(req, res) {
         let usuariosIds =req.body.idChecked;
         let array=Array.isArray(req.body.idChecked);
@@ -75,20 +86,33 @@ module.exports = function(app, swig, gestorBD) {
         }
     });
 
-    app.get("/usuarios", function(req, res) {
-        res.send("ver usuarios");
-    });
-
+    /**
+     * /registrarse
+     *
+     * Carga la vista de registro para que un usuario pueda registrarse
+     */
     app.get("/registrarse", function(req, res) {
         let respuesta = swig.renderFile('views/bregistro.html', {});
         res.send(respuesta);
     });
 
+    /**
+     * /identificarse
+     *
+     * Carga la vista de identificación para que un usuario ya registrado pueda
+     * iniciar sesión
+     */
     app.get("/identificarse", function(req, res) {
         let respuesta = swig.renderFile('views/bidentificacion.html', {});
         res.send(respuesta);
     });
 
+    /**
+     * /home
+     *
+     * Carga la vista de home, que se muestra al iniciar sesión con un usuario.
+     * En ella se cargan las ofertas destacadas
+     */
     app.get("/home", function(req, res) {
         let criterio = { "destacada" : true };
         gestorBD.obtenerOfertas(criterio, function (ofertas) {
@@ -102,6 +126,12 @@ module.exports = function(app, swig, gestorBD) {
         });
     });
 
+    /**
+     * /identificarse
+     *
+     * Identifica al usuario tras rellenar el formulario de inicio de sesión,
+     * comprobando que este está en la base de datos ya registrado
+     */
     app.post("/identificarse", function(req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
@@ -124,11 +154,22 @@ module.exports = function(app, swig, gestorBD) {
         });
     });
 
+    /**
+     * /desconectarse
+     *
+     * Desconecta al usuario de sesión y lo redirige al login
+     */
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
         res.redirect("/identificarse");
     });
 
+    /**
+     * /usuario
+     *
+     * Registra a un usuario en base de datos, haciendo una serie de validaciones y comprobando
+     * que no está ya registrado. Si se realiza con éxito se le inicia sesión directamente
+     */
     app.post('/usuario', function(req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
@@ -168,6 +209,13 @@ module.exports = function(app, swig, gestorBD) {
         });
     });
 
+    /**
+     * Método para validar los campos del registro
+     * @param usuario Usuario con los datos introducidos
+     * @param password Contraseña del usuario
+     * @param passwordConfirm Contraseña de confirmación
+     * @returns {string} Devuelve una cadena con los errores en el caso de que haya.
+     */
     function validacionRegistro(usuario,password,passwordConfirm) {
         let mensaje="";
         if (usuario.nombre.length<5){

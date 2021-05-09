@@ -72,9 +72,12 @@ routerUsuarioToken.use(function(req, res, next) {
         });
     }
 });
+
 // Aplicar routerUsuarioToken
 app.use('/api/oferta', routerUsuarioToken);
-
+app.use('/api/conversaciones', routerUsuarioToken);
+app.use('/api/chat', routerUsuarioToken);
+app.use('/api/borrar', routerUsuarioToken);
 
 // routerUsuarioSession
 var routerUsuarioSession = express.Router();
@@ -121,6 +124,7 @@ routerUsuarioVendedor.use(function(req, res, next) {
 app.use("/oferta/eliminar",routerUsuarioVendedor);
 app.use("/oferta/destacar",routerUsuarioVendedor);
 
+
 //routerUsuarioIniciarSesion
 let routerUsuarioIniciarSesion = express.Router();
 routerUsuarioIniciarSesion.use(function(req, res, next) {
@@ -138,6 +142,7 @@ routerUsuarioIniciarSesion.use(function(req, res, next) {
 app.use("/registrarse",routerUsuarioIniciarSesion);
 app.use("/identificarse",routerUsuarioIniciarSesion);
 
+
 //routerUsuarioAdmin
 let routerUsuarioAdmin = express.Router();
 routerUsuarioAdmin.use(function(req, res, next) {
@@ -154,6 +159,7 @@ routerUsuarioAdmin.use(function(req, res, next) {
 //Aplicar routerAdmin
 app.use("/usuario/list",routerUsuarioAdmin);
 app.use("/usuario/eliminar",routerUsuarioAdmin);
+
 
 //routerUsuarioEstandar
 let routerUsuarioEstandar = express.Router();
@@ -173,6 +179,7 @@ app.use("/oferta/agregar",routerUsuarioEstandar);
 app.use("/oferta/propias",routerUsuarioEstandar);
 app.use("/oferta/list",routerUsuarioEstandar);
 app.use("/oferta/compradas",routerUsuarioEstandar);
+
 
 app.use(express.static('public'));
 
@@ -202,7 +209,7 @@ app.use(function (err, req, res, next){
     }
 });
 
-//lanzar el servidor
+//Lanzar el servidor
 https.createServer({
     key: fs.readFileSync('certificates/alice.key'),
     cert: fs.readFileSync('certificates/alice.crt')

@@ -1,7 +1,11 @@
 //Función que exportamos como módulo
 module.exports = function(app,swig,gestorBD) {
 
-
+    /**
+     * /oferta/agregar
+     *
+     * Carga la vista para agregar una oferta a base de datos
+     */
     app.get('/oferta/agregar', function (req, res) {
         let respuesta = swig.renderFile('views/bagregar.html', {
             usuario : req.session.usuario,
@@ -11,6 +15,12 @@ module.exports = function(app,swig,gestorBD) {
         res.send(respuesta);
     });
 
+    /**
+     * /oferta/eliminar/:id
+     *
+     * Elimina una ofertacde base de datos al darle al botón eliminar, luego te redirige
+     * a las ofertas propias de cada usuario
+     */
     app.get('/oferta/eliminar/:id', function (req, res) {
         let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
         gestorBD.eliminarOferta(criterio,function(ofertas){
@@ -22,6 +32,12 @@ module.exports = function(app,swig,gestorBD) {
         });
     });
 
+    /**
+     * /oferta/list
+     *
+     * Muestra una lista con todas las ofertas que hay en base de datos utilizando
+     * la paginación
+     */
     app.get("/oferta/list", function(req, res) {
         let criterio = {};
         if( req.query.busqueda != null ){
@@ -68,6 +84,11 @@ module.exports = function(app,swig,gestorBD) {
         });
     });
 
+    /**
+     * /oferta/propias
+     *
+     * Lista las ofertas propias de cada usuario
+     */
     app.get("/oferta/propias", function(req, res) {
         let criterio = { vendedor : req.session.usuario };
         gestorBD.obtenerOfertas(criterio, function(ofertas) {
@@ -93,6 +114,13 @@ module.exports = function(app,swig,gestorBD) {
         });
     });
 
+    /**
+     * /oferta/comprar/:id
+     *
+     * Comprueba que puedas comprar una oferta y lo hace en el caso de que el usuario tenga saldo suficiente
+     * y no sea el dueño de la oferta. Luego modifica el saldo de los usuarios implicados, tanto vendedor
+     * como comprador
+     */
     app.get('/oferta/comprar/:id', function (req, res) {
         let criterioOferta = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
         gestorBD.obtenerOfertas(criterioOferta, function (ofertas) {
@@ -106,7 +134,7 @@ module.exports = function(app,swig,gestorBD) {
                     });
                 res.send(respuestaError);
             } else {
-                    if (isVendedorOrComprada2(ofertas[0], req.session.usuario)) {
+                    if (isVendedor(ofertas[0], req.session.usuario)) {
                         let respuestaError = swig.renderFile('views/error.html',
                             {
                                 mensajes : "No puedes comprar si eres el vendedor o ya la tienes comprada",
@@ -185,6 +213,11 @@ module.exports = function(app,swig,gestorBD) {
         });
     });
 
+    /**
+     * /oferta/compradas
+     *
+     * Lista las ofertas compradas por el usuario que inició sesión
+     */
     app.get('/oferta/compradas', function (req, res) {
         let criterio = { comprador : req.session.usuario };
         gestorBD.obtenerCompras(criterio ,function(compras){
@@ -217,6 +250,13 @@ module.exports = function(app,swig,gestorBD) {
         });
     });
 
+    /**
+     * /oferta/destacar/:id
+     *
+     * Destaca una oferta en caso de que un usuario quiera y tenga dinero. Destacar hace que
+     * la oferta aparezca en la zona privada del usuario justo después de iniciar sesión. Al igual que
+     * comprar también actualiza el saldo del propietario de la oferta restandole 20€
+     */
     app.get("/oferta/destacar/:id", function (req, res){
         let criterio = {
             vendedor : req.session.usuario,
@@ -274,6 +314,11 @@ module.exports = function(app,swig,gestorBD) {
         }
     });
 
+    /**
+     * /oferta/:id
+     *
+     * Carga los detalles de una oferta en concreto, mostrando todos sus datos
+     */
     app.get('/oferta/:id', function(req, res) {
         let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
         gestorBD.obtenerOfertas(criterio, function (ofertas) {
@@ -303,6 +348,12 @@ module.exports = function(app,swig,gestorBD) {
         });
     });
 
+    /**
+     * /oferta
+     *
+     * Inserta una oferta en base de datos cuando se completa el formulario que está
+     * en la vista de agregar oferta. Valida los campos antes de agregarla
+     */
     app.post("/oferta", function (req, res){
         let d=new Date();
         let oferta = {
@@ -354,6 +405,14 @@ module.exports = function(app,swig,gestorBD) {
         }
     });
 
+    /**
+     * Comprueba que el usuario no sea el vendedor de la oferta ni que la oferta
+     * ya este comprada
+     * @param compras Ofertas con el atributo de comprada a distinto de null
+     * @param oferta Oferta a comprobar
+     * @param usuario Usuario que quiere comprar la oferta
+     * @returns {boolean} Devuelve True si es el vendedor o ya esta comprada y False si no
+     */
     function isVendedorOrComprada(compras, oferta, usuario) {
         if ((oferta.vendedor) == usuario) {
             return true;
@@ -367,7 +426,13 @@ module.exports = function(app,swig,gestorBD) {
         }
     };
 
-    function isVendedorOrComprada2(oferta, usuario) {
+    /**
+     * Comprueba que el usuario no sea el vendedor de la oferta
+     * @param oferta Oferta a comprobar
+     * @param usuario Usuario que quiere comprar la oferta
+     * @returns {boolean} True si es el vendedor, False si no
+     */
+    function isVendedor(oferta, usuario) {
         if (oferta.vendedor == usuario)
             return true;
         if (oferta.vendedor == usuario)
@@ -375,6 +440,13 @@ module.exports = function(app,swig,gestorBD) {
         return false;
     };
 
+    /**
+     * Comprueba que el saldo del usuario sea mayor o igual que el precio de la
+     * oferta que se desea comprar
+     * @param oferta Oferta que se quiere comprar
+     * @param saldo Saldo del usuario que quiere comprar la oferta
+     * @returns {boolean} True si tiene y False si no
+     */
     function suficienteSaldo(oferta, saldo) {
         if (oferta.precio > saldo){
             return false;
@@ -383,6 +455,11 @@ module.exports = function(app,swig,gestorBD) {
         }
     };
 
+    /**
+     * Validación para comprobar los campos a la hora de agregar una oferta
+     * @param oferta Oferta que se quiere agregar
+     * @returns {string} Devuelve una cadena con los errores en el caso de que haya.
+     */
     function validacionAgregarOferta(oferta) {
         let mensaje="";
         if (oferta.titulo.length<4){
