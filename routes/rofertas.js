@@ -343,7 +343,7 @@ module.exports = function(app,swig,gestorBD) {
             });
         } else{
             app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no tiene suficiente saldo para destacar la oferta");
-            res.send(respuestaError);
+            res.redirect("/oferta/propias?mensaje=No tienes suficiente dinero para destacar esta oferta&tipoMensaje=alert-danger ");
         }
     });
 
