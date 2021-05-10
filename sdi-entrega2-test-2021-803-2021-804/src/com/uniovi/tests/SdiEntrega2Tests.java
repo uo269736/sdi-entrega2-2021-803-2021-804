@@ -1,6 +1,5 @@
 package com.uniovi.tests;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -9,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
-import org.bson.json.JsonReader;
 //Paquetes JUnit 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -85,7 +83,13 @@ public class SdiEntrega2Tests {
 	}
 
 	@AfterClass
-	static public void end() {
+	static public void end() {	
+		// Vamos al formulario de logueo.
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Rellenamos el formulario
+		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
+		PO_UserListView.removeUser(driver, "pruebasComprador@uniovi.es");
+		PO_UserListView.removeUser(driver, "prueba2728@email.com");
 		// Cerramos el navegador al finalizar las pruebas
 		driver.quit();
 		mongoClient.close();
@@ -301,7 +305,7 @@ public class SdiEntrega2Tests {
 				indice = i-1;
 		// Le damos a eliminar el primero
 		PO_UserListView.seleccionarUsuario(driver, indice);
-		PO_View.checkElement(driver,"free", "//button[contains(@type,'submit')]").get(0).click();;
+		PO_View.checkElement(driver,"free", "//button[contains(@type,'submit')]").get(0).click();
 		// Comprobamos que no está el usuario de antes
 		SeleniumUtils.textoNoPresentePagina(driver, "b@email.com");
 		// Ahora nos desconectamos
@@ -321,17 +325,8 @@ public class SdiEntrega2Tests {
 		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 		// Rellenamos el formulario
 		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
-		// Vamos a la lista de usuarios
-		PO_View.checkElement(driver, "text", "Gestion de Usuarios").get(0).click();
-		PO_View.checkElement(driver, "text", "Ver Usuarios").get(0).click();
-		// Seleccionamos los botones de eliminado
-		List<WebElement> emails = PO_View.checkElement(driver, "id", "email");
-		// Comprobamos que está el último usuario
-		SeleniumUtils.textoPresentePagina(driver, "prueba13@email.com");
-		// Seleccionamos al usuario que queremos eliminar
-		PO_UserListView.seleccionarUsuario(driver, emails.size() - 2);	// -2 ya que el primer email es el del administrador y no cuenta
-		// Le damos a eliminar
-		PO_View.checkElement(driver, "free", "//button[contains(@type,'submit')]").get(0).click();
+		// Eliminamos el ultimo usuario
+		PO_UserListView.removeUser(driver,"prueba13@email.com");
 		// Comprobamos que no está el último elemento
 		SeleniumUtils.EsperaCargaPaginaNoTexto(driver, "prueba13@email.com", 2);
 		// Ahora nos desconectamos
@@ -680,7 +675,10 @@ public class SdiEntrega2Tests {
 		SeleniumUtils.textoPresentePagina(driver, "No tienes suficiente dinero para comprar esta oferta");
 		// El saldo no ha variado, la compra no se ha realizado
 		SeleniumUtils.textoPresentePagina(driver, "0 €");
-		// Nos desconectamos
+		// Borramos la oferta creada y Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
+		PO_OfertasView.removeLastOffer(driver);
 		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
@@ -778,9 +776,12 @@ public class SdiEntrega2Tests {
 		// Vamos al formulario de logueo.
 		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario
-		PO_LoginView.fillForm(driver, "prueba29@email.com", "123456");
+		PO_LoginView.fillForm(driver, "pruebasComprador@uniovi.es", "123456");
+		// Creamos la oferta
+		PO_OfertaAddView.creaOferta(driver, "Prueba 29",
+				"Oferta destacada test", 20);
 		// Comprobamos que el saldo del usuario es menor que 20
-		SeleniumUtils.textoPresentePagina(driver, "15 €");
+		SeleniumUtils.textoPresentePagina(driver, "4 €");
 		// Seleccionamos el menu ofertas
 		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
 		// Accedemos a Ver Mis Ofertas
@@ -1052,9 +1053,9 @@ public class SdiEntrega2Tests {
 		// Entramos al chat
 		PO_View.checkElement(driver, "id", "entrar-chat").get(0).click();
 		// Comprobamos que ahora el mensaje esta leido
-		SeleniumUtils.EsperaCargaPagina(driver, "text", "Película australiana", 2);
-		SeleniumUtils.EsperaCargaPagina(driver, "text", "Prueba39", 2);
-		SeleniumUtils.EsperaCargaPagina(driver, "text", "Leido", 2);
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "Película australiana", 5);
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "Prueba39", 5);
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "Leido", 5);
 		
 	}
 
