@@ -431,7 +431,7 @@ public class SdiEntrega2Tests {
 	public void Prueba17() {
 		// Rellenamos el formulario de login
 		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
-		// Vamos a la lista de usuarios
+		// Vamos a la lista de ofertas propias
 		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
 		PO_View.checkElement(driver, "text", "Ver Mis Ofertas").get(0).click();
 		// Obtenemos los usuarios y los comparamos con la base de datos
@@ -539,77 +539,58 @@ public class SdiEntrega2Tests {
 					check = true;
 			assertTrue(check);
 		}
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
-//	// [Prueba21] Hacer una búsqueda escribiendo en el campo un texto que no exista
-//	// y comprobar que se muestra la página que corresponde, con la lista de ofertas
-//	// vacía.
-//	@Test
-//	public void Prueba21() {
-//		// Vamos al formulario de login
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario.
-//		PO_LoginView.fillForm(driver, "UO101014@uniovi.es", "123456");
-//		// Seleccionamos el menu ofertas
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'ofertas-menu')]/a");
-//		elementos.get(0).click();
-//		// Accedemos a Ver Ofertas
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/list')]");
-//		elementos.get(0).click();
-//		// Realizamos una busqueda de algo inexistente
-//		elementos = PO_View.checkElement(driver, "free", "//input[contains(@name, 'searchText')]");
-//		elementos.get(0).click();
-//		elementos.get(0).clear();
-//		elementos.get(0).click();
-//		elementos.get(0).sendKeys("nada");
-//		// Clickamos en Buscar
-//		By boton = By.className("btn");
-//		driver.findElement(boton).click();
-//		// Comprobamos que no se muestran ofertas
-//		List<Oferta> ofertas = ofertaService.getListaOfertas();
-//		for (Oferta o : ofertas)
-//			SeleniumUtils.textoNoPresentePagina(driver, o.getTitulo());
-//
-//		// Nos desconectamos
-//		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-//	}
-//
-//	// [Prueba22] Hacer una búsqueda escribiendo en el campo un texto en minúscula o
-//	// mayúscula y
-//	// comprobar que se muestra la página que corresponde, con la lista de ofertas
-//	// que contengan
-//	// dicho texto, independientemente que el título esté almacenado en minúsculas o
-//	// mayúscula.
-//	@Test
-//	public void Prueba22() {
-//		// Vamos al formulario de login
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario.
-//		PO_LoginView.fillForm(driver, "UO101014@uniovi.es", "123456");
-//		// Seleccionamos el menu ofertas
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'ofertas-menu')]/a");
-//		elementos.get(0).click();
-//		// Accedemos a Ver Ofertas
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/list')]");
-//		elementos.get(0).click();
-//		// Realizamos una busqueda de algo inexistente
-//		elementos = PO_View.checkElement(driver, "free", "//input[contains(@name, 'searchText')]");
-//		elementos.get(0).click();
-//		elementos.get(0).clear();
-//		elementos.get(0).click();
-//		elementos.get(0).sendKeys("nada");
-//		// Clickamos en Buscar
-//		By boton = By.className("btn");
-//		driver.findElement(boton).click();
-//		// Comprobamos que no se muestran ofertas
-//		List<Oferta> ofertas = ofertaService.getListaOfertas();
-//		for (Oferta o : ofertas)
-//			SeleniumUtils.textoNoPresentePagina(driver, o.getTitulo());
-//
-//		// Nos desconectamos
-//		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-//	}
-//
+	// [Prueba21] Hacer una búsqueda escribiendo en el campo un texto que no exista
+	// y comprobar que se muestra la página que corresponde, con la lista de ofertas
+	// vacía.
+	@Test
+	public void Prueba21() {
+		// Rellenamos el formulario de login
+		PO_LoginView.fillForm(driver, "pruebas@uniovi.es", "123456");
+		// Seleccionamos el menu ofertas
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
+		// Accedemos a Ver Ofertas
+		PO_View.checkElement(driver, "text", "Ver Ofertas").get(0).click();
+		// Seleccionamos los titulos de ofertas de base de datos
+		MongoIterable<Object> titulos = database.getCollection("ofertas").find().map(x->x.get("titulo"));
+		// Realizamos una busqueda de algo inexistente
+		PO_View.checkElement(driver, "free", "//input[contains(@name, 'busqueda')]").get(0).sendKeys("nada");
+		// Clickamos en Buscar
+		PO_View.checkElement(driver,"free", "//button[contains(@type, 'submit')]").get(0).click();;
+		// Comprobamos que no se muestran ofertas
+		for(Object titulo : titulos)
+			SeleniumUtils.textoNoPresentePagina(driver, titulo.toString());
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
+	// [Prueba22] Hacer una búsqueda escribiendo en el campo un texto en minúscula o
+	// mayúscula y
+	// comprobar que se muestra la página que corresponde, con la lista de ofertas
+	// que contengan
+	// dicho texto, independientemente que el título esté almacenado en minúsculas o
+	// mayúscula.
+	@Test
+	public void Prueba22() {
+		// Rellenamos el formulario de login
+		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
+		// Seleccionamos el menu ofertas
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
+		// Accedemos a Ver Ofertas
+		PO_View.checkElement(driver, "text", "Ver Ofertas").get(0).click();
+		// Realizamos una busqueda de algo inexistente
+		PO_View.checkElement(driver, "free", "//input[contains(@name, 'busqueda')]").get(0).sendKeys("pRUE");
+		// Clickamos en Buscar
+		PO_View.checkElement(driver,"free", "//button[contains(@type, 'submit')]").get(0).click();;
+		// Comprobamos que no se muestran ofertas
+		SeleniumUtils.textoPresentePagina(driver, "Prueba 15");
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
 //	// [Prueba23] Sobre una búsqueda determinada (a elección del desarrollador),
 //	// comprar una oferta que deja
 //	// un saldo positivo en el contador del comprador. Comprobar que el contador se
@@ -645,7 +626,7 @@ public class SdiEntrega2Tests {
 //		// Nos desconectamos
 //		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 //	}
-//
+
 //	// [Prueba24] Sobre una búsqueda determinada (a elección del desarrollador),
 //	// comprar una oferta que deja un saldo 0 en el contador del comprador.
 //	// Comprobar que el contador se actualiza correctamente en la
