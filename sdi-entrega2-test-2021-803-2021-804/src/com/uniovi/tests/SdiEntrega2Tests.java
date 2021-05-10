@@ -45,10 +45,10 @@ public class SdiEntrega2Tests {
 	// automÃ¡ticas)):
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
 	// Miguel
-	//static String Geckdriver024 = "C:\\Users\\MiguelUni\\Desktop\\TrabajoUniversidadMiguel\\Tercero\\SDI\\Sesion 5\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	static String Geckdriver024 = "C:\\Users\\MiguelUni\\Desktop\\TrabajoUniversidadMiguel\\Tercero\\SDI\\Sesion 5\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	// Alex
-	 static String Geckdriver024 =
-	 "C:\\Users\\Usuario\\Desktop\\CallateYa\\SDI\\Sesion5\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	// static String Geckdriver024 =
+	// "C:\\Users\\Usuario\\Desktop\\CallateYa\\SDI\\Sesion5\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	// ComÃºn a Windows y a MACOSX
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
@@ -90,6 +90,7 @@ public class SdiEntrega2Tests {
 		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
 		PO_UserListView.removeUser(driver, "pruebasComprador@uniovi.es");
 		PO_UserListView.removeUser(driver, "prueba2728@email.com");
+		PO_UserListView.removeUser(driver, "pruebas@uniovi.es");
 		// Cerramos el navegador al finalizar las pruebas
 		driver.quit();
 		mongoClient.close();
@@ -306,6 +307,9 @@ public class SdiEntrega2Tests {
 		// Le damos a eliminar el primero
 		PO_UserListView.seleccionarUsuario(driver, indice);
 		PO_View.checkElement(driver,"free", "//button[contains(@type,'submit')]").get(0).click();
+		// Vamos a la lista de usuarios
+		PO_View.checkElement(driver, "text", "Gestion de Usuarios").get(0).click();
+		PO_View.checkElement(driver, "text", "Ver Usuarios").get(0).click();
 		// Comprobamos que no está el usuario de antes
 		SeleniumUtils.textoNoPresentePagina(driver, "b@email.com");
 		// Ahora nos desconectamos
@@ -327,6 +331,9 @@ public class SdiEntrega2Tests {
 		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
 		// Eliminamos el ultimo usuario
 		PO_UserListView.removeUser(driver,"prueba13@email.com");
+		// Vamos a la lista de usuarios
+		PO_View.checkElement(driver, "text", "Gestion de Usuarios").get(0).click();
+		PO_View.checkElement(driver, "text", "Ver Usuarios").get(0).click();
 		// Comprobamos que no está el último elemento
 		SeleniumUtils.EsperaCargaPaginaNoTexto(driver, "prueba13@email.com", 2);
 		// Ahora nos desconectamos
@@ -369,12 +376,16 @@ public class SdiEntrega2Tests {
 		SeleniumUtils.textoPresentePagina(driver, "prueba142@email.com");
 		SeleniumUtils.textoPresentePagina(driver, "prueba143@email.com");
 		// Seleccionamos los usuarios que queremos eliminar
-		PO_UserListView.seleccionarUsuario(driver, emails.size()-2);
-		PO_UserListView.seleccionarUsuario(driver, emails.size()-3);
 		PO_UserListView.seleccionarUsuario(driver, emails.size()-4);
+		PO_UserListView.seleccionarUsuario(driver, emails.size()-3);
+		PO_UserListView.seleccionarUsuario(driver, emails.size()-2);
+		
 		// Le damos a eliminar
 		PO_View.checkElement(driver, "free", "//button[contains(@type,'submit')]").get(0).click();
-
+		
+		// Vamos a la lista de usuarios
+		PO_View.checkElement(driver, "text", "Gestion de Usuarios").get(0).click();
+		PO_View.checkElement(driver, "text", "Ver Usuarios").get(0).click();
 		// Comprobamos que no están los tres primeros de antes
 		SeleniumUtils.textoNoPresentePagina(driver, "prueba141@email.com");
 		SeleniumUtils.textoNoPresentePagina(driver, "prueba142@email.com");
@@ -388,11 +399,10 @@ public class SdiEntrega2Tests {
 	// Comprobar que la oferta sale en el listado de ofertas de dicho usuario.
 	@Test
 	public void Prueba15() {
-		// Vamos al formulario de login
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Vamos al formulario de registro
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
-		PO_LoginView.fillForm(driver, "pruebas@uniovi.es", "123456");
-		
+		PO_RegisterView.fillForm(driver, "pruebas@uniovi.es", "Josefo", "Perez", "123456", "123456");
 		// Creamos la oferta
 		PO_OfertaAddView.creaOferta(driver, "Prueba 15",
 				"Vendo el pato de goma que me regalo mi tia cuando era pequeño. Por cierto, es de goma", 4);
@@ -496,7 +506,7 @@ public class SdiEntrega2Tests {
 		List<WebElement> titulos = PO_View.checkElement(driver, "id", "titulo");
 		String titulo = titulos.get(titulos.size()-1).getText();	// Seleccionamos la ultima
 		// Borramos la oferta
-		PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/eliminar/')]").get(0).click();
+		PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/eliminar/')]").get(titulos.size()-1).click();
 		// Comprobamos que no este la primera oferta
 		SeleniumUtils.textoNoPresentePagina(driver, titulo);
 		// Nos desconectamos
@@ -578,7 +588,7 @@ public class SdiEntrega2Tests {
 		// Clickamos en Buscar
 		PO_View.checkElement(driver,"free", "//button[contains(@type, 'submit')]").get(0).click();
 		// Comprobamos que no se muestran ofertas
-		SeleniumUtils.textoPresentePagina(driver, "Prueba 15");
+		SeleniumUtils.textoPresentePagina(driver, "Prueba 18");
 		// Nos desconectamos
 		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
@@ -600,7 +610,7 @@ public class SdiEntrega2Tests {
 		// Accedemos a Ver Ofertas
 		PO_View.checkElement(driver, "text", "Ver Ofertas").get(0).click();
 		// Realizamos una busqueda de algo existente
-		PO_View.checkElement(driver, "free", "//input[contains(@name, 'busqueda')]").get(0).sendKeys("pRUEba 15");
+		PO_View.checkElement(driver, "free", "//input[contains(@name, 'busqueda')]").get(0).sendKeys("pRUEba 18");
 		// Clickamos en Buscar
 		PO_View.checkElement(driver,"free", "//button[contains(@type, 'submit')]").get(0).click();
 		// Comprobamos el saldo
@@ -702,7 +712,7 @@ public class SdiEntrega2Tests {
 		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
-// [Prueba27] Al crear una oferta marcar dicha oferta como destacada y a
+	// [Prueba27] Al crear una oferta marcar dicha oferta como destacada y a
 	// continuación comprobar: i) que
 	// aparece en el listado de ofertas destacadas para los usuarios y que el saldo
 	// del usuario se actualiza
@@ -713,10 +723,6 @@ public class SdiEntrega2Tests {
 		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_RegisterView.fillForm(driver, "prueba2728@email.com", "prueba2728", "Perez", "123456", "123456");
-//		// Vamos al formulario de logueo.
-//		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
-//		// Rellenamos el formulario
-//		PO_LoginView.fillForm(driver, "prueba2728@email.com", "123456");
 		// Comprobamos que el saldo del usuario es el que tiene que ser
 		SeleniumUtils.textoPresentePagina(driver, "100 €");
 		// Creamos la oferta y la destacamos al crearla seleccionando el checkbox
@@ -781,7 +787,7 @@ public class SdiEntrega2Tests {
 		PO_OfertaAddView.creaOferta(driver, "Prueba 29",
 				"Oferta destacada test", 20);
 		// Comprobamos que el saldo del usuario es menor que 20
-		SeleniumUtils.textoPresentePagina(driver, "4 €");
+		SeleniumUtils.textoPresentePagina(driver, "0 €");
 		// Seleccionamos el menu ofertas
 		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
 		// Accedemos a Ver Mis Ofertas
