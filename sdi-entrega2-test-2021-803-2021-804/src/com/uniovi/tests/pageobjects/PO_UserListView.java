@@ -5,6 +5,8 @@ import java.util.List;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.uniovi.tests.util.SeleniumUtils;
+
 public class PO_UserListView extends PO_NavView {
 
 //	static public void checkAllUsers(WebDriver driver, UserService userService) {
@@ -34,6 +36,7 @@ public class PO_UserListView extends PO_NavView {
 		for(int i=1; i<emails.size(); i++) 
 			if(emails.get(i).getText().equals(email))
 				seleccionarUsuario(driver,i-1);
+		SeleniumUtils.esperarSegundos(driver, 5);
 		PO_View.checkElement(driver,"free", "//button[contains(@type,'submit')]").get(0).click();
 	}
 //

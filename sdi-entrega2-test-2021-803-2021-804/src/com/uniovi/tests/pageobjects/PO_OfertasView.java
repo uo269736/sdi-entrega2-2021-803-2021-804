@@ -1,6 +1,5 @@
 package com.uniovi.tests.pageobjects;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.WebDriver;
@@ -25,7 +24,7 @@ public class PO_OfertasView extends PO_NavView {
 		// Accedemos a Ver Ofertas
 		PO_View.checkElement(driver, "text", "Ver Mis Ofertas").get(0).click();
 		// Seleccionamos la oferta a borrar
-		List<WebElement> botones = PO_View.checkElement(driver, "id", "eliminar");
+		List<WebElement> botones = PO_View.checkElement(driver, "free", "//a[contains(@id, 'eliminar')]");
 		botones.get(botones.size()-1).click();
 	}
 }
