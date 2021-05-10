@@ -54,9 +54,6 @@ routerUsuarioToken.use(function(req, res, next) {
                     acceso : false,
                     error: 'Token invalido o caducado'
                 });
-                // También podríamos comprobar que intoToken.usuario existe
-                return;
-
             } else {
                 // dejamos correr la petición
                 res.usuario = infoToken.usuario;
