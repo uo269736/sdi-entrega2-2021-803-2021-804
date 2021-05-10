@@ -22,16 +22,20 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoIterable;
 import com.uniovi.tests.pageobjects.PO_Chat;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
+import com.uniovi.tests.pageobjects.PO_OfertaAddView;
 import com.uniovi.tests.pageobjects.PO_OfertasView;
 import com.uniovi.tests.pageobjects.PO_RegisterView;
+import com.uniovi.tests.pageobjects.PO_UserListView;
 import com.uniovi.tests.pageobjects.PO_View;
 //Paquetes Utilidades de Testing Propias
 import com.uniovi.tests.util.SeleniumUtils;
@@ -43,10 +47,10 @@ public class SdiEntrega2Tests {
 	// automÃ¡ticas)):
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
 	// Miguel
-	static String Geckdriver024 = "C:\\Users\\MiguelUni\\Desktop\\TrabajoUniversidadMiguel\\Tercero\\SDI\\Sesion 5\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	//static String Geckdriver024 = "C:\\Users\\MiguelUni\\Desktop\\TrabajoUniversidadMiguel\\Tercero\\SDI\\Sesion 5\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	// Alex
-	 //static String Geckdriver024 =
-	 //"C:\\Users\\Usuario\\Desktop\\CallateYa\\SDI\\Sesion5\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	 static String Geckdriver024 =
+	 "C:\\Users\\Usuario\\Desktop\\CallateYa\\SDI\\Sesion5\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	// ComÃºn a Windows y a MACOSX
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
@@ -248,294 +252,295 @@ public class SdiEntrega2Tests {
 		SeleniumUtils.textoNoPresentePagina(driver, "Desconectarse");
 	}
 
-//	// [Prueba11] Mostrar el listado de usuarios y comprobar que se muestran todos
-//	// los que existen en el sistema.
-//	@Test
-//	public void Prueba11() {
-//		// Vamos al formulario de logueo.
-//		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
-//		// Rellenamos el formulario
-//		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
-//		// Pinchamos en la opción de menu de Usuarios: //li[contains(@id,
-//		// 'gestionUsuarios')]/a
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'gestionUsuarios')]/a");
-//		elementos.get(0).click();
-//		// Pinchamos en la opción de lista de usuarios.
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href,'/usuario/list')]");
-//		elementos.get(0).click();
-//		PO_UserListView.checkAllUsers(driver,database.getCollection("usuarios").count());
-//	}
-//
-//	// [Prueba12] Ir a la lista de usuarios, borrar el primer usuario de la lista,
-//	// comprobar que la lista se actualiza y que el usuario desaparece.
-//	@Test
-//	public void Prueba12() {
-//		// Vamos al formulario de logueo.
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario
-//		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
-//		// Pinchamos en la opción de menu de Usuarios: //li[contains(@id,
-//		// 'users-menu')]/a
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'users-menu')]/a");
-//		elementos.get(0).click();
-//		// Pinchamos en la opción de lista de usuarios.
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href,'user/list')]");
-//		elementos.get(0).click();
-//		// Sacamos la lista de usuarios
-//		List<User> usuarios = usersService.getUsers();
-//		// Comprobamos que está el primer usuario
-//		PO_UserListView.comprobarElementoDeLista(driver, 0, usuarios, true);
-//		// Seleccionamos los usuarios que queremos eliminar
-//		PO_UserListView.seleccionarUsuario(driver, 0);
-//		// Le damos a eliminar
-//		elementos = PO_View.checkElement(driver, "free", "//button[contains(@type,'submit')]");
-//		elementos.get(0).click();
-//		// Comprobamos que no está el primer elemento de antes
-//		PO_UserListView.comprobarElementoDeLista(driver, 0, usuarios, false);
-//	}
-//
-//	// [Prueba13] Ir a la lista de usuarios, borrar el último usuario de la lista,
-//	// comprobar que la lista se actualiza y que el usuario desaparece.
-//	@Test
-//	public void Prueba13() {
-//		// Vamos al formulario de logueo.
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario
-//		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
-//		// Pinchamos en la opción de menu de Usuarios: //li[contains(@id,
-//		// 'users-menu')]/a
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'users-menu')]/a");
-//		elementos.get(0).click();
-//		// Pinchamos en la opción de lista de usuarios.
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href,'user/list')]");
-//		elementos.get(0).click();
-//		// Sacamos la lista de usuarios
-//		List<User> usuarios = usersService.getUsers();
-//		// Comprobamos que está el último usuario (en este caso como es un admin es el
-//		// antepenultimo)
-//		PO_UserListView.comprobarElementoDeLista(driver, usuarios.size() - 2, usuarios, true);
-//		// Seleccionamos los usuarios que queremos eliminar
-//		PO_UserListView.seleccionarUsuario(driver, usuarios.size() - 2);
-//		// Le damos a eliminar
-//		elementos = PO_View.checkElement(driver, "free", "//button[contains(@type,'submit')]");
-//		elementos.get(0).click();
-//		// Comprobamos que no está el último elemento (penúltimo)
-//		PO_UserListView.comprobarElementoDeLista(driver, usuarios.size() - 2, usuarios, false);
-//	}
-//
-//	// [Prueba14] Ir a la lista de usuarios, borrar 3 usuarios, comprobar que la
-//	// lista se actualiza y que los usuarios desaparecen
-//	@Test
-//	public void Prueba14() {
-//		// Vamos al formulario de logueo.
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario
-//		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
-//		// Pinchamos en la opción de menu de Usuarios: //li[contains(@id,
-//		// 'users-menu')]/a
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'users-menu')]/a");
-//		elementos.get(0).click();
-//		// Pinchamos en la opción de lista de usuarios.
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href,'user/list')]");
-//		elementos.get(0).click();
-//		// Sacamos la lista de usuarios
-//		List<User> usuarios = usersService.getUsers();
-//		// Comprobamos que están los tres primeros usuarios
-//		PO_UserListView.comprobarElementoDeLista(driver, usuarios.size() - 2, usuarios, true);
-//		// Seleccionamos los usuarios que queremos eliminar
-//		PO_UserListView.seleccionarUsuario(driver, 0);
-//		PO_UserListView.seleccionarUsuario(driver, 1);
-//		PO_UserListView.seleccionarUsuario(driver, 2);
-//		// Le damos a eliminar
-//		elementos = PO_View.checkElement(driver, "free", "//button[contains(@type,'submit')]");
-//		elementos.get(0).click();
-//		// Comprobamos que no están los tres primeros de antes
-//		PO_UserListView.comprobarElementoDeLista(driver, 0, usuarios, false);
-//		PO_UserListView.comprobarElementoDeLista(driver, 1, usuarios, false);
-//		PO_UserListView.comprobarElementoDeLista(driver, 2, usuarios, false);
-//	}
-//
-//	// [Prueba15] Ir al formulario de alta de oferta, rellenarla con datos válidos y
-//	// pulsar el botón Submit.
-//	// Comprobar que la oferta sale en el listado de ofertas de dicho usuario.
-//	@Test
-//	public void Prueba15() {
-//		// Vamos al formulario de login
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario.
-//		PO_LoginView.fillForm(driver, "UO101014@uniovi.es", "123456");
-//		// Creamos la oferta
-//		PO_OfertaAddView.creaOferta(driver, "Pato de goma",
-//				"Vendo el pato de goma que me regalo mi tia cuando era pequeño. Por cierto, es de goma", 4);
-//		// Vamos al listado de ofertas personales
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'ofertas-menu')]/a");
-//		elementos.get(0).click();
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/userlist')]");
-//		elementos.get(0).click();
-//		// Comprobamos que la oferta creada esta presente en la ultima posicion
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@class, 'page-link')]");
-//		elementos.get(elementos.size() - 1).click();
-//		SeleniumUtils.textoPresentePagina(driver, "Pato de goma");
-//		// Nos desconectamos
-//		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-//	}
-//
-//	// [Prueba16] Ir al formulario de alta de oferta, rellenarla con datos inválidos
-//	// (campo título vacío) y pulsar
-//	// el botón Submit. Comprobar que se muestra el mensaje de campo obligatorio.
-//	@Test
-//	public void Prueba16() {
-//		// Vamos al formulario de login
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario.
-//		PO_LoginView.fillForm(driver, "UO101014@uniovi.es", "123456");
-//		// Creamos oferta no valida
-//		PO_OfertaAddView.creaOferta(driver, "Pato",
-//				"Vendo el pato de goma que me regalo mi tia cuando era pequeño. Por cierto, es de goma", 4);
-//		PO_OfertaAddView.checkKey(driver, "Error.oferta.titulo.length", PO_Properties.getSPANISH());
-//
-//		// Rellenamos el formulario con descripcion no valida
-//		PO_OfertaAddView.fillForm(driver, "Pato de goma", "Vendo pato", String.valueOf(4));
-//		PO_OfertaAddView.checkKey(driver, "Error.oferta.descripcion.length", PO_Properties.getSPANISH());
-//
-//		// Rellenamos el formulario con precio no valido
-//		PO_OfertaAddView.fillForm(driver, "Pato",
-//				"Vendo el pato de goma que me regalo mi tia cuando era pequeño. Por cierto, es de goma",
-//				String.valueOf(-1));
-//		PO_OfertaAddView.checkKey(driver, "Error.oferta.cantidad.negativa", PO_Properties.getSPANISH());
-//
-//		// Nos desconectamos
-//		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-//	}
-//
-//	// [Prueba17] Mostrar el listado de ofertas para dicho usuario y comprobar que
-//	// se muestran todas los que existen para este usuario.
-//	@Test
-//	public void Prueba17() {
-//		// Vamos al formulario de login
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario.
-//		PO_LoginView.fillForm(driver, "UO101014@uniovi.es", "123456");
-//		// Seleccionamos el menu ofertas
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'ofertas-menu')]/a");
-//		elementos.get(0).click();
-//		// Accedemos a Ver Mis Ofertas
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/userlist')]");
-//		elementos.get(0).click();
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@class, 'page-link')]");
-//		// Comprobamos que las ofertas de este usuario esten presentes
-//		List<Oferta> ofertas = ofertaService.getListaOfertas();
-//		User usuario = usersService.getUserByEmail("UO101014@uniovi.es");
-//		List<Oferta> userOfertas = new ArrayList<Oferta>();
-//		// Eliminamos las ofertas que no sean del usuario
-//		for (Oferta o : ofertas) {
-//			if (o.getUser().getEmail() == usuario.getEmail())
-//				userOfertas.add(o);
-//		}
-//		// Realizamos las comprobaciones en cada pagina
-//		PO_OfertaUserList.comprobarAllOfertas(driver, usuario, userOfertas, elementos);
-//
-//		// Nos desconectamos
-//		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-//	}
-//
-//	// [Prueba18] Ir a la lista de ofertas, borrar la primera oferta de la lista,
-//	// comprobar que la lista se actualiza y que la oferta desaparece.
-//	@Test
-//	public void Prueba18() {
-//		// Vamos al formulario de login
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario.
-//		PO_LoginView.fillForm(driver, "UO101014@uniovi.es", "123456");
-//		User usuario = usersService.getUserByEmail("UO101014@uniovi.es");
-//		// Seleccionamos el menu ofertas
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'ofertas-menu')]/a");
-//		elementos.get(0).click();
-//		// Accedemos a Ver Mis Ofertas
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/userlist')]");
-//		elementos.get(0).click();
-//		// Comprobamos que este la primera oferta
-//		List<Oferta> misOfertas = new ArrayList<Oferta>();
-//		for (Oferta o : ofertaService.getListaOfertas())
-//			if (usuario.getEmail().equals(o.getUser().getEmail()))
-//				misOfertas.add(o);
-//		int posicion = 0;
-//		String titulo = misOfertas.get(posicion).getTitulo();
-//		SeleniumUtils.textoPresentePagina(driver, titulo);
-//		// Borramos la primera oferta
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/delete')]");
-//		elementos.get(0).click();
-//		// Comprobamos que no este la primera oferta
-//		SeleniumUtils.textoNoPresentePagina(driver, titulo);
-//		// Nos desconectamos
-//		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-//	}
-//
-//	// [Prueba19] Ir a la lista de ofertas, borrar la última oferta de la lista,
-//	// comprobar que la lista se actualiza y
-//	// que la oferta desaparece.
-//	@Test
-//	public void Prueba19() {
-//		// Vamos al formulario de login
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario.
-//		PO_LoginView.fillForm(driver, "UO101014@uniovi.es", "123456");
-//		User usuario = usersService.getUserByEmail("UO101014@uniovi.es");
-//		// Seleccionamos el menu ofertas
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'ofertas-menu')]/a");
-//		elementos.get(0).click();
-//		// Accedemos a Ver Mis Ofertas
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/userlist')]");
-//		elementos.get(0).click();
-//		// Comprobamos que este la ultima oferta
-//		List<Oferta> misOfertas = new ArrayList<Oferta>();
-//		for (Oferta o : ofertaService.getListaOfertas())
-//			if (usuario.getEmail().equals(o.getUser().getEmail()))
-//				misOfertas.add(o);
-//		int posicion = misOfertas.size() - 1;
-//		String titulo = misOfertas.get(posicion).getTitulo();
-//		PO_OfertaUserList.comprobarElementoDeLista(driver, posicion, misOfertas, true);
-//		// Esperamos a que se muestren los enlaces de paginación la lista de notas
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@class, 'page-link')]");
-//		// Nos vamos a la última página
-//		elementos.get(posicion).click();
-//		// Borramos la ultima oferta
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/delete')]");
-//		elementos.get(posicion).click();
-//		// Comprobamos que no este la primera oferta
-//		SeleniumUtils.textoNoPresentePagina(driver, titulo);
-//		// Nos desconectamos
-//		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-//	}
-//
-//	// [Prueba20] Hacer una búsqueda con el campo vacío y comprobar que se muestra
-//	// la página que corresponde con el listado de las ofertas existentes en el
-//	// sistema
-//	@Test
-//	public void Prueba20() {
-//		// Vamos al formulario de login
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario.
-//		PO_LoginView.fillForm(driver, "UO101014@uniovi.es", "123456");
-//		// Seleccionamos el menu ofertas
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'ofertas-menu')]/a");
-//		elementos.get(0).click();
-//		// Accedemos a Ver Ofertas
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/list')]");
-//		elementos.get(0).click();
-//		// Clickamos en Buscar
-//		elementos = PO_View.checkElement(driver, "free", "//button[contains(@type, 'submit')]");
-//		elementos.get(0).click();
-//		// Comprobamos que las ofertas de este usuario esten presentes
-//		List<Oferta> ofertas = ofertaService.getListaOfertas();
-//		User usuario = usersService.getUserByEmail("UO101014@uniovi.es");
-//		// Realizamos las comprobaciones en cada pagina
-//		PO_OfertaUserList.comprobarAllOfertasPaginaPorPagina(driver, usuario, ofertas, elementos);
-//
-//		// Nos desconectamos
-//		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-//	}
-//
+	// [Prueba11] Mostrar el listado de usuarios y comprobar que se muestran todos
+	// los que existen en el sistema.
+	@Test
+	public void Prueba11() {
+		// Vamos al formulario de logueo.
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Rellenamos el formulario como administrador
+		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
+		// Vamos a la lista de usuarios
+		PO_View.checkElement(driver, "text", "Gestion de Usuarios").get(0).click();
+		PO_View.checkElement(driver, "text", "Ver Usuarios").get(0).click();
+		// Obtenemos los usuarios y los comparamos con la base de datos
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "Email", 2);
+		List<WebElement> emails = PO_View.checkElement(driver, "free", "//td[contains(@id,'email')]");
+		MongoIterable<Object> usuarios = database.getCollection("usuarios").find().map(x->x.get("email"));
+		
+		for(WebElement email : emails) {
+			boolean check = false;
+			for(Object usuario : usuarios) 
+				if(usuario.toString().equals(email.getText()))
+					check = true;
+			assertTrue(check);
+		}
+		
+		// Ahora nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
+	// [Prueba12] Ir a la lista de usuarios, borrar el primer usuario de la lista,
+	// comprobar que la lista se actualiza y que el usuario desaparece.
+	@Test
+	public void Prueba12() {
+		// Vamos al formulario de logueo.
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Rellenamos el formulario como administrador
+		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
+		// Vamos a la lista de usuarios
+		PO_View.checkElement(driver, "text", "Gestion de Usuarios").get(0).click();
+		PO_View.checkElement(driver, "text", "Ver Usuarios").get(0).click();
+		// Seleccionamos los botones de eliminado
+		List<WebElement> emails = PO_View.checkElement(driver, "id", "email");
+		// Para evitar que se pueda eliminar uno de los usuarios utilizados en tests posteriores
+		// borraremos al usuario creado en el primer test -> b@email.com
+		int indice=emails.size()-1;
+		for(int i=1; i<emails.size(); i++)
+			if(emails.get(i).getText().equals("b@email.com"))
+				indice = i-1;
+		// Le damos a eliminar el primero
+		PO_UserListView.seleccionarUsuario(driver, indice);
+		PO_View.checkElement(driver,"free", "//button[contains(@type,'submit')]").get(0).click();;
+		// Comprobamos que no está el usuario de antes
+		SeleniumUtils.textoNoPresentePagina(driver, "b@email.com");
+		// Ahora nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
+	// [Prueba13] Ir a la lista de usuarios, borrar el último usuario de la lista,
+	// comprobar que la lista se actualiza y que el usuario desaparece.
+	// Para evitar errores, registraremos un usuario y lo borraremos
+	@Test
+	public void Prueba13() {
+		// Vamos al formulario de registro
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_RegisterView.fillForm(driver, "prueba13@email.com", "Josefo", "Perez", "123456", "123456");
+		// Ahora nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		// Rellenamos el formulario
+		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
+		// Vamos a la lista de usuarios
+		PO_View.checkElement(driver, "text", "Gestion de Usuarios").get(0).click();
+		PO_View.checkElement(driver, "text", "Ver Usuarios").get(0).click();
+		// Seleccionamos los botones de eliminado
+		List<WebElement> emails = PO_View.checkElement(driver, "id", "email");
+		// Comprobamos que está el último usuario
+		SeleniumUtils.textoPresentePagina(driver, "prueba13@email.com");
+		// Seleccionamos al usuario que queremos eliminar
+		PO_UserListView.seleccionarUsuario(driver, emails.size() - 2);	// -2 ya que el primer email es el del administrador y no cuenta
+		// Le damos a eliminar
+		PO_View.checkElement(driver, "free", "//button[contains(@type,'submit')]").get(0).click();
+		// Comprobamos que no está el último elemento
+		SeleniumUtils.EsperaCargaPaginaNoTexto(driver, "prueba13@email.com", 2);
+		// Ahora nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
+	// [Prueba14] Ir a la lista de usuarios, borrar 3 usuarios, comprobar que la
+	// lista se actualiza y que los usuarios desaparecen
+	// Como en el test anterior, para evitar errores crearemos los 3 usuarios a borrar despues
+	@Test
+	public void Prueba14() {
+		// Vamos al formulario de registro
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_RegisterView.fillForm(driver, "prueba141@email.com", "Josefo", "Perez", "123456", "123456");
+		// Ahora nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		// Vamos al formulario de registro
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_RegisterView.fillForm(driver, "prueba142@email.com", "Josefo", "Perez", "123456", "123456");
+		// Ahora nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		// Vamos al formulario de registro
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_RegisterView.fillForm(driver, "prueba143@email.com", "Josefo", "Perez", "123456", "123456");
+		// Ahora nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		
+		// Rellenamos el formulario de login
+		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
+		// Vamos a la lista de usuarios
+		PO_View.checkElement(driver, "text", "Gestion de Usuarios").get(0).click();
+		PO_View.checkElement(driver, "text", "Ver Usuarios").get(0).click();
+		// Seleccionamos los botones de eliminado
+		List<WebElement> emails = PO_View.checkElement(driver, "id", "email");
+		// Comprobamos que están los ultimos usuarios
+		SeleniumUtils.textoPresentePagina(driver, "prueba141@email.com");
+		SeleniumUtils.textoPresentePagina(driver, "prueba142@email.com");
+		SeleniumUtils.textoPresentePagina(driver, "prueba143@email.com");
+		// Seleccionamos los usuarios que queremos eliminar
+		PO_UserListView.seleccionarUsuario(driver, emails.size()-2);
+		PO_UserListView.seleccionarUsuario(driver, emails.size()-3);
+		PO_UserListView.seleccionarUsuario(driver, emails.size()-4);
+		// Le damos a eliminar
+		PO_View.checkElement(driver, "free", "//button[contains(@type,'submit')]").get(0).click();
+
+		// Comprobamos que no están los tres primeros de antes
+		SeleniumUtils.textoNoPresentePagina(driver, "prueba141@email.com");
+		SeleniumUtils.textoNoPresentePagina(driver, "prueba142@email.com");
+		SeleniumUtils.textoNoPresentePagina(driver, "prueba143@email.com");
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
+	// [Prueba15] Ir al formulario de alta de oferta, rellenarla con datos válidos y
+	// pulsar el botón Submit.
+	// Comprobar que la oferta sale en el listado de ofertas de dicho usuario.
+	@Test
+	public void Prueba15() {
+		// Vamos al formulario de login
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_LoginView.fillForm(driver, "pruebas@uniovi.es", "123456");
+		
+		// Creamos la oferta
+		PO_OfertaAddView.creaOferta(driver, "Prueba 15",
+				"Vendo el pato de goma que me regalo mi tia cuando era pequeño. Por cierto, es de goma", 4);
+		// Vamos al listado de ofertas personales
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
+		PO_View.checkElement(driver, "text", "Ver Mis Ofertas").get(0).click();
+		// Comprobamos que la oferta creada esta presente
+		SeleniumUtils.textoPresentePagina(driver, "Prueba 15");
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
+	// [Prueba16] Ir al formulario de alta de oferta, rellenarla con datos inválidos
+	// (campo título vacío) y pulsar
+	// el botón Submit. Comprobar que se muestra el mensaje de campo obligatorio.
+	@Test
+	public void Prueba16() {
+		// Rellenamos el formulario de login
+		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
+		// Creamos oferta no valida (campos vacios)
+		PO_OfertaAddView.creaOferta(driver, "","", 0);
+		//Vemos que seguimos en la misma pagina (error no capturable ya que los input muestran aviso de campo vacio)
+		SeleniumUtils.textoPresentePagina(driver, "Agregar oferta");
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
+	// [Prueba17] Mostrar el listado de ofertas para dicho usuario y comprobar que
+	// se muestran todas los que existen para este usuario.
+	@Test
+	public void Prueba17() {
+		// Rellenamos el formulario de login
+		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
+		// Vamos a la lista de usuarios
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
+		PO_View.checkElement(driver, "text", "Ver Mis Ofertas").get(0).click();
+		// Obtenemos los usuarios y los comparamos con la base de datos
+		//SeleniumUtils.EsperaCargaPagina(driver, "text", "Prueba 15", 3);
+		List<WebElement> titulos = PO_View.checkElement(driver, "free", "//td[contains(@id,'titulo')]");
+		
+		MongoIterable<Object> ofertas = database.getCollection("ofertas").find().map(x->x.get("titulo"));
+		for(WebElement titulo : titulos) {
+			boolean check = false;
+			for(Object oferta : ofertas) 
+				if(oferta.toString().equals(titulo.getText()))
+					check = true;
+			assertTrue(check);
+			System.out.println(check);
+		}
+		
+		// Ahora nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
+	// [Prueba18] Ir a la lista de ofertas, borrar la primera oferta de la lista,
+	// comprobar que la lista se actualiza y que la oferta desaparece.
+	@Test
+	public void Prueba18() {
+		// Vamos al formulario de login
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_LoginView.fillForm(driver, "pruebas@uniovi.es", "123456");
+
+		// Creamos una oferta por si no tuviesemos
+		PO_OfertaAddView.creaOferta(driver, "Prueba 18",
+				"Vendo el pato de goma que me regalo mi tia cuando era pequeño. Por cierto, es de goma", 4);
+		// Vamos al listado de ofertas personales
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
+		PO_View.checkElement(driver, "text", "Ver Mis Ofertas").get(0).click();
+		// Comprobamos que la oferta creada esta presente
+		SeleniumUtils.textoPresentePagina(driver, "Prueba 18");
+		
+		// Comprobamos las ofertas
+		List<WebElement> titulos = PO_View.checkElement(driver, "id", "titulo");
+		String titulo = titulos.get(0).getText();	// Seleccionamos la primera
+		// Borramos la primera oferta
+		PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/eliminar/')]").get(0).click();
+		// Comprobamos que no este la primera oferta
+		SeleniumUtils.textoNoPresentePagina(driver, titulo);
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
+	// [Prueba19] Ir a la lista de ofertas, borrar la última oferta de la lista,
+	// comprobar que la lista se actualiza y
+	// que la oferta desaparece.
+	@Test
+	public void Prueba19() {
+		// Vamos al formulario de login
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_LoginView.fillForm(driver, "pruebas@uniovi.es", "123456");
+
+		// Creamos una oferta por si no tuviesemos
+		PO_OfertaAddView.creaOferta(driver, "Prueba 19",
+				"Vendo el pato de goma que me regalo mi tia cuando era pequeño. Por cierto, es de goma", 4);
+		// Vamos al listado de ofertas personales
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
+		PO_View.checkElement(driver, "text", "Ver Mis Ofertas").get(0).click();
+		// Comprobamos que la oferta creada esta presente
+		SeleniumUtils.textoPresentePagina(driver, "Prueba 19");
+		
+		// Comprobamos las ofertas
+		List<WebElement> titulos = PO_View.checkElement(driver, "id", "titulo");
+		String titulo = titulos.get(titulos.size()-1).getText();	// Seleccionamos la ultima
+		// Borramos la oferta
+		PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/eliminar/')]").get(0).click();
+		// Comprobamos que no este la primera oferta
+		SeleniumUtils.textoNoPresentePagina(driver, titulo);
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
+	// [Prueba20] Hacer una búsqueda con el campo vacío y comprobar que se muestra
+	// la página que corresponde con el listado de las ofertas existentes en el
+	// sistema
+	@Test
+	public void Prueba20() {
+		// Vamos al formulario de login
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
+		// Seleccionamos el menu ofertas
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
+		// Accedemos a Ver Ofertas
+		PO_View.checkElement(driver, "text", "Ver Ofertas").get(0).click();
+		
+		// Clickamos en Buscar
+		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//button[contains(@type, 'submit')]");
+		elementos.get(0).click();
+		// Comprobamos que las ofertas esten presentes
+		List<WebElement> titulos = PO_View.checkElement(driver, "id", "titulo");
+		MongoIterable<Object> ofertas = database.getCollection("ofertas").find().map(x->x.get("titulo"));
+		
+		for(WebElement titulo : titulos) {
+			boolean check = false;
+			for(Object oferta : ofertas) 
+				if(oferta.toString().equals(titulo.getText()))
+					check = true;
+			assertTrue(check);
+		}
+	}
+
 //	// [Prueba21] Hacer una búsqueda escribiendo en el campo un texto que no exista
 //	// y comprobar que se muestra la página que corresponde, con la lista de ofertas
 //	// vacía.

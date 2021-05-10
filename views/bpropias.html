@@ -18,7 +18,7 @@
 <!-- Inicio del Bloque oferta -->
     {% for oferta in ofertas %}
         <tr>
-            <td>{{oferta.titulo}}</td>
+            <td id="titulo">{{oferta.titulo}}</td>
             <td>{{oferta.descripcion}}</td>
             <td>{{oferta.precio}} €</td>
             <td><a href="/oferta/details/{{oferta._id.toString()}}">detalles</a></td>

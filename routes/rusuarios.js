@@ -104,6 +104,7 @@ module.exports = function(app, swig, gestorBD) {
      */
     app.get("/identificarse", function(req, res) {
         let respuesta = swig.renderFile('views/bidentificacion.html', {});
+        app.get("logger").info("Accediendo a la vista de inicio de sesión");
         res.send(respuesta);
     });
 

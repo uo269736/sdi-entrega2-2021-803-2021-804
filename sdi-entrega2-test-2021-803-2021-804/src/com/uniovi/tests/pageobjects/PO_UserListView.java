@@ -1,5 +1,10 @@
 package com.uniovi.tests.pageobjects;
 
+import java.util.List;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
 public class PO_UserListView extends PO_NavView {
 
 //	static public void checkAllUsers(WebDriver driver, UserService userService) {
@@ -11,13 +16,13 @@ public class PO_UserListView extends PO_NavView {
 //		}
 //	}
 //
-//	static public void seleccionarUsuario(WebDriver driver, int posicion) {
-//		// Sacamos todos los elemetos que tienen checkbox
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//input[contains(@type,'checkbox')]");
-//		// Si la posicion es correcta seleccionas el checkbox
-//		if (posicion < elementos.size())
-//			elementos.get(posicion).click();
-//	}
+	static public void seleccionarUsuario(WebDriver driver, int posicion) {
+		// Sacamos todos los elemetos que tienen checkbox
+		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//input[contains(@type,'checkbox')]");
+		// Si la posicion es correcta seleccionas el checkbox
+		if (posicion < elementos.size())
+			elementos.get(posicion).click();
+	}
 //
 //	static public void comprobarElementoDeLista(WebDriver driver, int posicion, List<User> usuarios, boolean esta) {
 //		// Sacamos todos los usuarios del sistema
