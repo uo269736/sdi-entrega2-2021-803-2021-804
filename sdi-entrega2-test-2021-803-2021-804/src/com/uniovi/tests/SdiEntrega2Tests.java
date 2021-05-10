@@ -581,160 +581,132 @@ public class SdiEntrega2Tests {
 		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
 		// Accedemos a Ver Ofertas
 		PO_View.checkElement(driver, "text", "Ver Ofertas").get(0).click();
-		// Realizamos una busqueda de algo inexistente
+		// Realizamos una busqueda de algo con mayusculas y minusculas
 		PO_View.checkElement(driver, "free", "//input[contains(@name, 'busqueda')]").get(0).sendKeys("pRUE");
 		// Clickamos en Buscar
-		PO_View.checkElement(driver,"free", "//button[contains(@type, 'submit')]").get(0).click();;
+		PO_View.checkElement(driver,"free", "//button[contains(@type, 'submit')]").get(0).click();
 		// Comprobamos que no se muestran ofertas
 		SeleniumUtils.textoPresentePagina(driver, "Prueba 15");
 		// Nos desconectamos
 		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
-//	// [Prueba23] Sobre una búsqueda determinada (a elección del desarrollador),
-//	// comprar una oferta que deja
-//	// un saldo positivo en el contador del comprador. Comprobar que el contador se
-//	// actualiza correctamente
-//	// en la vista del comprador
-//	@Test
-//	public void Prueba23() {
-//		// Vamos al formulario de login
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario -> usuario con saldo muy elevado.
-//		PO_LoginView.fillForm(driver, "UO101011@uniovi.es", "123456");
-//		User usuario = usersService.getUserByEmail("UO101011@uniovi.es");
-//		double saldoInicial = usuario.getSaldo();
-//		List<Oferta> ofertas = ofertaService.getListaOfertas();
-//		Oferta oferta = null;
-//		for (int i = 0; i < ofertas.size(); i++)
-//			if (!ofertas.get(i).isComprada()) {
-//				oferta = ofertas.get(i);
-//				break;
-//			}
-//		// Seleccionamos el menu ofertas
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'ofertas-menu')]/a");
-//		elementos.get(0).click();
-//		// Accedemos a Ver Ofertas
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/list')]");
-//		elementos.get(0).click();
-//		// Realizamos una compra
-//		elementos = PO_View.checkElement(driver, "free", "//button[contains(@id, 'buyButton')]");
-//		elementos.get(0).click();
-//		// Comprobamos el saldo
-//		SeleniumUtils.textoPresentePagina(driver, "Saldo: " + (saldoInicial - oferta.getCantidad()));
-//
-//		// Nos desconectamos
-//		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-//	}
+	// [Prueba23] Sobre una búsqueda determinada (a elección del desarrollador),
+	// comprar una oferta que deja
+	// un saldo positivo en el contador del comprador. Comprobar que el contador se
+	// actualiza correctamente
+	// en la vista del comprador
+	@Test
+	public void Prueba23() {
+		// Vamos al formulario de registro
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_RegisterView.fillForm(driver, "pruebasComprador@uniovi.es", "Comprador", "Comprador", "123456", "123456");
+		
+		// Seleccionamos el menu ofertas
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
+		// Accedemos a Ver Ofertas
+		PO_View.checkElement(driver, "text", "Ver Ofertas").get(0).click();
+		// Realizamos una busqueda de algo existente
+		PO_View.checkElement(driver, "free", "//input[contains(@name, 'busqueda')]").get(0).sendKeys("pRUEba 15");
+		// Clickamos en Buscar
+		PO_View.checkElement(driver,"free", "//button[contains(@type, 'submit')]").get(0).click();
+		// Comprobamos el saldo
+		SeleniumUtils.textoPresentePagina(driver, "100 €");
+		// Clickamos en comprar
+		PO_View.checkElement(driver,"free", "//button[contains(@class, 'btn btn-primary')]").get(0).click();
+		// Comprobamos que se actualiza el saldo
+		SeleniumUtils.textoPresentePagina(driver, "96 €");
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
 
-//	// [Prueba24] Sobre una búsqueda determinada (a elección del desarrollador),
-//	// comprar una oferta que deja un saldo 0 en el contador del comprador.
-//	// Comprobar que el contador se actualiza correctamente en la
-//	// vista del comprador.
-//	@Test
-//	public void Prueba24() {
-//		// Vamos al formulario de login
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario.
-//		PO_LoginView.fillForm(driver, "UO101014@uniovi.es", "123456");
-//		// Creamos una oferta que comprara un nuevo usuario
-//		PO_OfertaAddView.creaOferta(driver, "Balon de baloncesto",
-//				"Pelota de baloncesto de maxima calidad, sin estrenar.", 100);
-//		// Nos desconectamos
-//		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-//		// Nos registramos
-//		// Vamos al formulario de registro
-//		PO_HomeView.clickOption(driver, "signup", "class", "btn btn-primary");
-//		PO_RegisterView.fillForm(driver, "prueba24@email.com", "El Pepe", "Perez", "123456", "123456");
-//		// Seleccionamos el menu ofertas
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'ofertas-menu')]/a");
-//		elementos.get(0).click();
-//		// Accedemos a Ver Ofertas
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/list')]");
-//		elementos.get(0).click();
-//		// Realizamos la busqueda
-//		elementos = PO_View.checkElement(driver, "free", "//input[contains(@name, 'searchText')]");
-//		elementos.get(0).click();
-//		elementos.get(0).clear();
-//		elementos.get(0).click();
-//		elementos.get(0).sendKeys("Balon de baloncesto");
-//		// Clickamos en Buscar
-//		By boton = By.className("btn");
-//		driver.findElement(boton).click();
-//		// Realizamos la compra que nos deje el saldo a 0
-//		elementos = PO_View.checkElement(driver, "free", "//button[contains(@id, 'buyButton')]");
-//		elementos.get(0).click();
-//		// Comprobamos el saldo a 0
-//		SeleniumUtils.textoPresentePagina(driver, "Saldo: 0");
-//		// Nos desconectamos
-//		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-//	}
-//
-//	// [Prueba25] Sobre una búsqueda determinada (a elección del desarrollador),
-//	// intentar comprar una oferta que esté por encima de saldo disponible del
-//	// comprador. Y comprobar que se muestra el mensaje de saldo no suficiente.
-//	@Test
-//	public void Prueba25() {
-//		// Vamos al formulario de login
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario.
-//		PO_LoginView.fillForm(driver, "UO101014@uniovi.es", "123456");
-//		User usuario = usersService.getUserByEmail("UO101014@uniovi.es");
-//		// Seleccionamos el menu ofertas
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'ofertas-menu')]/a");
-//		elementos.get(0).click();
-//		// Accedemos a Ver Ofertas
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href, 'oferta/list')]");
-//		elementos.get(0).click();
-//		// Buscamos la oferta mas cara "Motocicleta"
-//		elementos = PO_View.checkElement(driver, "free", "//input[contains(@name, 'searchText')]");
-//		elementos.get(0).click();
-//		elementos.get(0).clear();
-//		elementos.get(0).click();
-//		elementos.get(0).sendKeys("Motocicleta");
-//
-//		// Clickamos en Buscar
-//		By boton = By.className("btn");
-//		driver.findElement(boton).click();
-//		String saldo = String.valueOf(usuario.getSaldo());
-//		SeleniumUtils.textoPresentePagina(driver, saldo);
-//
-//		// Intentamos realizar la compra
-//		elementos = PO_View.checkElement(driver, "free", "//button[contains(@id, 'buyButton')]");
-//		elementos.get(0).click();
-//		// No pasa nada y no podemos capturar el error ya que hacemos uso del metodo
-//		// alert para notificarlo
-//		// Por tanto para asegurar su correcto funcionamiento esperamos 2 seg
-//		SeleniumUtils.esperarSegundos(driver, 2);
-//		driver.navigate().to("http://localhost:8080/");
-//		// El saldo no ha variado, la compra no se ha realizado
-//		SeleniumUtils.textoPresentePagina(driver, saldo);
-//		// Nos desconectamos
-//		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-//	}
-//
-//	// [Prueba26] Ir a la opción de ofertas compradas del usuario y mostrar la
-//	// lista. Comprobar que aparecen las ofertas que deben aparecer.
-//	@Test
-//	public void Prueba26() {
-//		// Vamos al formulario de logueo.
-//		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-//		// Rellenamos el formulario
-//		PO_LoginView.fillForm(driver, "UO101010@uniovi.es", "123456");
-//		// Pinchamos en la opción de menu de Usuarios: //li[contains(@id,
-//		// 'users-menu')]/a
-//		List<WebElement> elementos = PO_View.checkElement(driver, "free", "//li[contains(@id, 'ofertas-menu')]/a");
-//		elementos.get(0).click();
-//		// Pinchamos en la opción de lista de usuarios.
-//		elementos = PO_View.checkElement(driver, "free", "//a[contains(@href,'oferta/userlistcompradas')]");
-//		elementos.get(0).click();
-//		// Comprobamos que entramos en las lista de compras
-//		SeleniumUtils.textoPresentePagina(driver, "Mis Compras");
-//		// Seleccionamos los usuarios que queremos eliminar
-//		PO_OfertasCompradasListView.comprobarOfertasCompradas(driver, ofertaService, "UO101010@uniovi.es");
-//
-//	}
-//
+	// [Prueba24] Sobre una búsqueda determinada (a elección del desarrollador),
+	// comprar una oferta que deja un saldo 0 en el contador del comprador.
+	// Comprobar que el contador se actualiza correctamente en la
+	// vista del comprador.
+	@Test
+	public void Prueba24() {
+		// Rellenamos el formulario.
+		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
+		// Creamos una oferta que comprara un nuevo usuario
+		PO_OfertaAddView.creaOferta(driver, "Balon de baloncesto",
+				"Pelota de baloncesto de maxima calidad, sin estrenar.", 96);
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		// Iniciamos sesion
+		PO_LoginView.fillForm(driver, "pruebasComprador@uniovi.es", "123456");
+		// Seleccionamos el menu ofertas
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
+		// Accedemos a Ver Ofertas
+		PO_View.checkElement(driver, "text", "Ver Ofertas").get(0).click();
+		// Realizamos una busqueda de algo existente
+		PO_View.checkElement(driver, "free", "//input[contains(@name, 'busqueda')]").get(0).sendKeys("Balon de baloncesto");
+		// Clickamos en Buscar
+		PO_View.checkElement(driver,"free", "//button[contains(@type, 'submit')]").get(0).click();
+		// Comprobamos el saldo
+		SeleniumUtils.textoPresentePagina(driver, "96 €");
+		// Clickamos en comprar
+		PO_View.checkElement(driver,"free", "//button[contains(@class, 'btn btn-primary')]").get(0).click();
+		// Comprobamos el saldo a 0
+		SeleniumUtils.textoPresentePagina(driver, "0 €");
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
+	// [Prueba25] Sobre una búsqueda determinada (a elección del desarrollador),
+	// intentar comprar una oferta que esté por encima de saldo disponible del
+	// comprador. Y comprobar que se muestra el mensaje de saldo no suficiente.
+	@Test
+	public void Prueba25() {
+		// Rellenamos el formulario.
+		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
+		PO_OfertaAddView.creaOferta(driver, "Prueba 25",
+				"Pelota de baloncesto de maxima calidad, sin estrenar.", 96);
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		// Rellenamos el formulario.
+		PO_LoginView.fillForm(driver, "pruebasComprador@uniovi.es", "123456");
+		// Comprobamos el saldo
+		SeleniumUtils.EsperaCargaPagina(driver,"text", "0 €", 2);
+		// Seleccionamos el menu ofertas
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
+		// Accedemos a Ver Ofertas
+		PO_View.checkElement(driver, "text", "Ver Ofertas").get(0).click();
+		// Buscamos la oferta creada
+		PO_View.checkElement(driver, "free", "//input[contains(@name, 'busqueda')]").get(0).sendKeys("Prueba 25");
+		// Clickamos en Buscar
+		PO_View.checkElement(driver,"free", "//button[contains(@type, 'submit')]").get(0).click();
+		// Intentamos realizar la compra
+		PO_View.checkElement(driver,"free", "//button[contains(@class, 'btn btn-primary')]").get(0).click();
+		// Capturamos el mensaje de error
+		SeleniumUtils.textoPresentePagina(driver, "No tienes suficiente dinero para comprar esta oferta");
+		// El saldo no ha variado, la compra no se ha realizado
+		SeleniumUtils.textoPresentePagina(driver, "0 €");
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
+	// [Prueba26] Ir a la opción de ofertas compradas del usuario y mostrar la
+	// lista. Comprobar que aparecen las ofertas que deben aparecer.
+	@Test
+	public void Prueba26() {
+		// Rellenamos el formulario.
+		PO_LoginView.fillForm(driver, "pruebasComprador@uniovi.es", "123456");
+		FindIterable<Document> ofertas = database.getCollection("ofertas").find();
+		// Seleccionamos el menu ofertas
+		PO_View.checkElement(driver, "text", "Gestion de Ofertas").get(0).click();
+		// Accedemos a Ver Ofertas
+		PO_View.checkElement(driver, "text", "Ver Mis Compras").get(0).click();
+		for(Document d : ofertas) {
+			if(d.get("comprador")!=null)
+				if(d.get("comprador")=="pruebasComprador@uniovi.es")
+					SeleniumUtils.textoPresentePagina(driver, (String)d.get("titulo"));
+		}
+		// Nos desconectamos
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+	}
+
 //	// [Prueba27] Al crear una oferta marcar dicha oferta como destacada y a
 //	// continuación comprobar: i) que
 //	// aparece en el listado de ofertas destacadas para los usuarios y que el saldo
