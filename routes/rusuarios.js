@@ -49,13 +49,14 @@ module.exports = function(app, swig, gestorBD) {
                     "vendedor": usuariosIds[i],
                     "comprador": null
                 };
-
+                let criterioMensajes={$or: [{"emailVendedor":usuariosIds[i]},{"emailInteresado":usuariosIds[i]}]};
                 if(!array){
                     criterio={"email": usuariosIds};
                     criterioOfertas={
                         "vendedor": usuariosIds,
                         "comprador": null
                     };
+                    criterioMensajes={$or: [{"emailVendedor":usuariosIds},{"emailInteresado":usuariosIds}]};
                 }
                 gestorBD.eliminarUsuario(criterio, function (id) {
                     if (id == null) {
@@ -64,8 +65,11 @@ module.exports = function(app, swig, gestorBD) {
                         gestorBD.obtenerOfertas(criterioOfertas, function(ofertas){
                             for (i = 0; i < ofertas.length; i++) {
                                 let criterioBorrado = {"_id" : ofertas[i]._id }
-                                gestorBD.eliminarOferta(criterioBorrado, function(ofertas){});
+                                gestorBD.eliminarOferta(criterioBorrado, function(ofertas){
+                                });
                             }
+                            gestorBD.eliminarMensaje(criterioMensajes,function(mensajes){
+                            });
                         });
                     }
                 });

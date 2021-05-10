@@ -173,7 +173,7 @@ module.exports = function(app, gestorBD) {
                     error : "se ha producido un error"
                 })
             } else {
-                app.get("logger").info("[API] El usuario "+req.session.usuario+" ha insertado con éxito el mensaje con texto "+req.body.mensaje);
+                app.get("logger").info("[API] El usuario "+req.session.usuario+" ha borrado con éxito los mensajes de la oferta con id "+ req.params.idOferta);
                 res.status(200);
                 res.json(JSON.stringify(mensajes))
             }

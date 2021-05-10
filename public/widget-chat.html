@@ -92,6 +92,7 @@
                     tituloOferta: tituloOferta
                 },
                 dataType: 'json',
+                headers: { "token": token },
                 success: function (respuesta) {
                     $("#escribir-mensaje").val("");
                     cargarChat();

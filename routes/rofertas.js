@@ -36,6 +36,9 @@ module.exports = function(app,swig,gestorBD) {
                 app.get("logger").info("ERROR:El usuario con email "+ req.session.usuario+ " no ha podido eliminar la oferta con id "+req.params.id);
                 res.send(respuestaError);
             } else {
+                let criterioMensajes={"idOferta" : req.params.id };
+                gestorBD.eliminarMensaje(criterioMensajes,function(mensajes){
+                });
                 app.get("logger").info("El usuario con email "+ req.session.usuario+" ha eliminado con éxito la oferta con id "+req.params.id);
                 res.redirect("/oferta/propias");
             }
@@ -427,10 +430,14 @@ module.exports = function(app,swig,gestorBD) {
                                 app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no ha podido destacar la oferta con título "+req.body.nombre+" porque no tenía suficiente saldo");
                                 res.send(respuesta);
                             }else{
-                                app.get("logger").info("El usuario "+req.session.usuario+" ha creado la oferta con título "+req.body.nombre +" con éxito y accedio a sus ofertas propias" );
+                                app.get("logger").info("El usuario "+req.session.usuario+" ha creado la oferta con título "+req.body.nombre +" con éxito, la ha destacado y accedió a sus ofertas propias" );
                                 res.redirect("/oferta/propias");
                             }
                         });
+                    }
+                    else{
+                        app.get("logger").info("El usuario "+req.session.usuario+" ha creado la oferta con título "+req.body.nombre +" con éxito y accedió a sus ofertas propias" );
+                        res.redirect("/oferta/propias");
                     }
                 }
             });
