@@ -54,16 +54,16 @@
 
     let url = new URL(window.location.href);
     let w = url.searchParams.get("w");
-    if ( w == "login"){
+    if ( w === "login"){
       $( "#contenedor-principal" ).load("widget-login.html");
     }
-    if ( w == "ofertas"){
+    if ( w === "ofertas"){
       $( "#contenedor-principal" ).load("widget-ofertas.html");
     }
-    if ( w == "chat"){
+    if ( w === "chat"){
       $( "#contenedor-principal" ).load("widget-chat.html");
     }
-    if ( w == "conversaciones"){
+    if ( w === "conversaciones"){
       $( "#contenedor-principal" ).load("widget-conversaciones.html");
     }
   }

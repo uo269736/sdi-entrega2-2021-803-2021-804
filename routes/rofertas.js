@@ -12,21 +12,31 @@ module.exports = function(app,swig,gestorBD) {
             rol : req.session.rol,
             saldo : req.session.saldo
         });
+        app.get("logger").info("El usuario "+req.session.usuario +" ha accedido a la página para agregar una oferta");
         res.send(respuesta);
     });
 
     /**
      * /oferta/eliminar/:id
      *
-     * Elimina una ofertacde base de datos al darle al botón eliminar, luego te redirige
+     * Elimina una oferta de base de datos al darle al botón eliminar, luego te redirige
      * a las ofertas propias de cada usuario
      */
     app.get('/oferta/eliminar/:id', function (req, res) {
         let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
         gestorBD.eliminarOferta(criterio,function(ofertas){
             if ( ofertas == null ){
-                res.send(respuesta);
+                let respuestaError = swig.renderFile('views/error.html',
+                    {
+                        mensajes : "Error al eliminar",
+                        usuario : req.session.usuario,
+                        rol : req.session.rol,
+                        saldo : req.session.saldo
+                    });
+                app.get("logger").info("ERROR:El usuario con email "+ req.session.usuario+ " no ha podido eliminar la oferta con id "+req.params.id);
+                res.send(respuestaError);
             } else {
+                app.get("logger").info("El usuario con email "+ req.session.usuario+" ha eliminado con éxito la oferta con id "+req.params.id);
                 res.redirect("/oferta/propias");
             }
         });
@@ -58,6 +68,7 @@ module.exports = function(app,swig,gestorBD) {
                         rol : req.session.rol,
                         saldo : req.session.saldo
                     });
+                app.get("logger").info("ERROR:El usuario con email "+ req.session.usuario+ " no ha podido listar las ofertas");
                 res.send(respuestaError);
             } else {
                 let ultimaPg = total/5;
@@ -79,6 +90,7 @@ module.exports = function(app,swig,gestorBD) {
                         rol : req.session.rol,
                         saldo : req.session.saldo
                     });
+                app.get("logger").info("El usuario "+ req.session.usuario+ " ha accedido al listado de ofertas y se han cargado con éxito");
                 res.send(respuesta);
             }
         });
@@ -100,6 +112,7 @@ module.exports = function(app,swig,gestorBD) {
                         rol : req.session.rol,
                         saldo : req.session.saldo
                     });
+                app.get("logger").info("ERROR:El usuario con email "+ req.session.usuario+ " no ha podido listar las ofertas propias");
                 res.send(respuestaError);
             } else {
                 let respuesta = swig.renderFile('views/bpropias.html',
@@ -109,6 +122,7 @@ module.exports = function(app,swig,gestorBD) {
                         rol : req.session.rol,
                         saldo : req.session.saldo
                     });
+                app.get("logger").info("El usuario "+ req.session.usuario+ " ha accedido al listado de ofertas propias y se han cargado con éxito");
                 res.send(respuesta);
             }
         });
@@ -132,6 +146,7 @@ module.exports = function(app,swig,gestorBD) {
                         rol : req.session.rol,
                         saldo : req.session.saldo
                     });
+                app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no ha podido recuperar la oferta con id "+req.params.id);
                 res.send(respuestaError);
             } else {
                     if (isVendedor(ofertas[0], req.session.usuario)) {
@@ -142,9 +157,11 @@ module.exports = function(app,swig,gestorBD) {
                                 rol : req.session.rol,
                                 saldo : req.session.saldo
                             });
+                        app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no puede comprar la oferta con id "+req.params.id+" porque es el vendedor o ya la tiene comprada");
                         res.send(respuestaError);
                     } else {
                             if(!suficienteSaldo(ofertas[0],req.session.saldo)){
+                                app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no tiene suficiente saldo para comprar la oferta con id "+req.params.id);
                                 res.redirect("/oferta/list?mensaje=No tienes suficiente dinero para comprar esta oferta&tipoMensaje=alert-danger ");
                             }
                             else {
@@ -158,6 +175,7 @@ module.exports = function(app,swig,gestorBD) {
                                                 rol : req.session.rol,
                                                 saldo : req.session.saldo
                                             });
+                                        app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no ha podido comprar la oferta con id "+req.params.id);
                                         res.send(respuestaError);
                                     } else {
                                         let newSaldo=req.session.saldo-ofertas[0].precio;
@@ -172,6 +190,7 @@ module.exports = function(app,swig,gestorBD) {
                                                         rol : req.session.rol,
                                                         saldo : req.session.saldo
                                                     });
+                                                app.get("logger").info("ERROR: El usuario "+req.session.usuario+" ha tenido un error al procesar el pago para comprar la oferta con id "+req.params.id);
                                                 res.send(respuestaError);
                                             } else {
                                                 criterio = { "email" : ofertas[0].vendedor }
@@ -184,6 +203,7 @@ module.exports = function(app,swig,gestorBD) {
                                                                 rol: req.session.rol,
                                                                 saldo: req.session.saldo
                                                             });
+                                                        app.get("logger").info("ERROR: El usuario "+req.session.usuario+" ha tenido un error al obtener el vendedor de la oferta con id "+req.params.id);
                                                         res.send(respuestaError);
                                                     } else {
                                                         newSaldo=parseFloat(usuarios[0].saldo)+parseFloat(ofertas[0].precio);
@@ -196,8 +216,10 @@ module.exports = function(app,swig,gestorBD) {
                                                                         rol: req.session.rol,
                                                                         saldo: req.session.saldo
                                                                     });
+                                                                app.get("logger").info("ERROR: El usuario "+req.session.usuario+" ha tenido un error al pagarle a "+ ofertas[0].vendedor+ " por la oferta con id "+req.params.id);
                                                                 res.send(respuestaError);
                                                             } else {
+                                                                app.get("logger").info("El usuario "+ req.session.usuario+ " ha comprado la oferta con id "+req.params.id +" con éxito");
                                                                 res.redirect("/oferta/list");
                                                             }
                                                         });
@@ -209,7 +231,7 @@ module.exports = function(app,swig,gestorBD) {
                                 });
                             }
                         }
-                    };
+                    }
         });
     });
 
@@ -229,10 +251,11 @@ module.exports = function(app,swig,gestorBD) {
                         rol : req.session.rol,
                         saldo : req.session.saldo
                     });
+                app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no ha podido cargar la lista de ofertas compradas");
                 res.send(respuestaError);
             } else {
                 let ofertasCompradasIds = [];
-                for(i=0; i<compras.length; i++){
+                for(let i=0; i<compras.length; i++){
                     ofertasCompradasIds.push( compras[i]._id );
                 }
                 let criterio = { "_id" : { $in: ofertasCompradasIds } }
@@ -244,6 +267,7 @@ module.exports = function(app,swig,gestorBD) {
                             rol : req.session.rol,
                             saldo : req.session.saldo
                         });
+                    app.get("logger").info("ERROR: El usuario "+req.session.usuario+" ha cargado con éxito la lista de ofertas compradas");
                     res.send(respuesta);
                 });
             }
@@ -272,6 +296,7 @@ module.exports = function(app,swig,gestorBD) {
         if(req.session.saldo >= 20) {
             gestorBD.obtenerOfertas(criterio, function (ofertas) {
                 if (ofertas == null) {
+                    app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no no ha podido obtener la oferta");
                     res.send(respuestaError);
                 } else {
                     {
@@ -285,6 +310,8 @@ module.exports = function(app,swig,gestorBD) {
                                         rol : req.session.rol,
                                         saldo : req.session.saldo
                                     });
+                                app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no ha podido destacar la oferta con éxito");
+                                res.send(respuestaError);
                             }else{
                                 let cantidad = req.session.saldo - 20;
                                 req.session.saldo = cantidad;
@@ -298,9 +325,11 @@ module.exports = function(app,swig,gestorBD) {
                                                 rol: req.session.rol,
                                                 saldo: req.session.saldo
                                             });
+                                        app.get("logger").info("ERROR: El usuario "+req.session.usuario+" ha tenido un error al ingresar el dinero para destacar una oferta");
                                         res.send(respuesta);
                                     }
                                     else{
+                                        app.get("logger").info("El usuario "+req.session.usuario+" ha destacado la oferta con id "+req.params.id+" con éxito");
                                         res.redirect("/oferta/propias");
                                     }
                                 });
@@ -310,6 +339,7 @@ module.exports = function(app,swig,gestorBD) {
                 }
             });
         } else{
+            app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no tiene suficiente saldo para destacar la oferta");
             res.send(respuestaError);
         }
     });
@@ -330,6 +360,7 @@ module.exports = function(app,swig,gestorBD) {
                         rol : req.session.rol,
                         saldo : req.session.saldo
                     });
+                app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no ha podido recuperar la oferta con id "+req.params.id);
                 res.send(respuestaError);
             } else {
                 criterio = {"usuario": req.session.usuario};
@@ -342,6 +373,7 @@ module.exports = function(app,swig,gestorBD) {
                             oferta: ofertas[0],
                             propietario: isVendedorOrComprada(compras, ofertas[0], req.session.usuario)
                         });
+                    app.get("logger").info("El usuario "+req.session.usuario+" ha accedido con éxito a los detalles de la oferta con id "+req.params.id);
                     res.send(respuesta);
                 });
             }
@@ -363,10 +395,10 @@ module.exports = function(app,swig,gestorBD) {
             fecha : d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear(),
             vendedor: req.session.usuario,
             comprador : null,
-            destacada : (req.body.destacada=="on")
+            destacada : (req.body.destacada==="on")
         }
         let mensaje=validacionAgregarOferta(oferta);
-        if(mensaje=="") {
+        if(mensaje==="") {
             gestorBD.insertarOferta(oferta, function(id){
                 if (id == null) {
                     let respuestaError = swig.renderFile('views/error.html',
@@ -376,9 +408,10 @@ module.exports = function(app,swig,gestorBD) {
                             rol : req.session.rol,
                             saldo : req.session.saldo
                         });
+                    app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no ha crear la oferta con título "+req.body.nombre);
                     res.send(respuestaError);
                 } else {
-                    if(req.body.destacada=="on") {
+                    if(req.body.destacada==="on") {
                         let cantidad = req.session.saldo - 20;
                         req.session.saldo = cantidad;
                         let criterio = {"email": req.session.usuario};
@@ -391,8 +424,10 @@ module.exports = function(app,swig,gestorBD) {
                                         rol: req.session.rol,
                                         saldo: req.session.saldo
                                     });
+                                app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no ha podido destacar la oferta con título "+req.body.nombre+" porque no tenía suficiente saldo");
                                 res.send(respuesta);
                             }else{
+                                app.get("logger").info("El usuario "+req.session.usuario+" ha creado la oferta con título "+req.body.nombre +" con éxito y accedio a sus ofertas propias" );
                                 res.redirect("/oferta/propias");
                             }
                         });
@@ -400,10 +435,11 @@ module.exports = function(app,swig,gestorBD) {
                 }
             });
         }else{
+            app.get("logger").info("ERROR: El usuario "+req.session.usuario+" no cumple la validación al crear la oferta por los siguientes motivos "+mensaje);
             res.redirect("/oferta/agregar" +
                 "?mensaje="+mensaje+"&tipoMensaje=alert-danger ");
         }
-    });
+    })
 
     /**
      * Comprueba que el usuario no sea el vendedor de la oferta ni que la oferta
@@ -414,7 +450,7 @@ module.exports = function(app,swig,gestorBD) {
      * @returns {boolean} Devuelve True si es el vendedor o ya esta comprada y False si no
      */
     function isVendedorOrComprada(compras, oferta, usuario) {
-        if ((oferta.vendedor) == usuario) {
+        if ((oferta.vendedor) === usuario) {
             return true;
         } else {
             for (let i = 0; i < compras.length; i++) {
@@ -424,7 +460,7 @@ module.exports = function(app,swig,gestorBD) {
             }
             return false;
         }
-    };
+    }
 
     /**
      * Comprueba que el usuario no sea el vendedor de la oferta
@@ -433,12 +469,8 @@ module.exports = function(app,swig,gestorBD) {
      * @returns {boolean} True si es el vendedor, False si no
      */
     function isVendedor(oferta, usuario) {
-        if (oferta.vendedor == usuario)
-            return true;
-        if (oferta.vendedor == usuario)
-            return true;
-        return false;
-    };
+        return oferta.vendedor === usuario;
+    }
 
     /**
      * Comprueba que el saldo del usuario sea mayor o igual que el precio de la
@@ -448,12 +480,8 @@ module.exports = function(app,swig,gestorBD) {
      * @returns {boolean} True si tiene y False si no
      */
     function suficienteSaldo(oferta, saldo) {
-        if (oferta.precio > saldo){
-            return false;
-        } else {
-            return true;
-        }
-    };
+        return oferta.precio <= saldo;
+    }
 
     /**
      * Validación para comprobar los campos a la hora de agregar una oferta
@@ -472,5 +500,5 @@ module.exports = function(app,swig,gestorBD) {
             mensaje+="El precio no puede ser negativo<br>";
         }
         return mensaje;
-    };
+    }
 };

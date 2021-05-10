@@ -112,7 +112,7 @@ routerUsuarioVendedor.use(function(req, res, next) {
     gestorBD.obtenerOfertas(
         {_id: mongo.ObjectID(id) }, function (ofertas) {
             console.log(ofertas[0]);
-            if(ofertas[0].vendedor == req.session.usuario ){
+            if(ofertas[0].vendedor === req.session.usuario ){
                 next();
             } else {
                 res.redirect("/oferta/propias");
@@ -147,7 +147,7 @@ app.use("/identificarse",routerUsuarioIniciarSesion);
 let routerUsuarioAdmin = express.Router();
 routerUsuarioAdmin.use(function(req, res, next) {
     console.log("routerUsuarioAdmin");
-    if ( req.session.rol=="admin" ) {
+    if ( req.session.rol==="admin" ) {
         // dejamos correr la petición
         next();
     } else {
@@ -165,7 +165,7 @@ app.use("/usuario/eliminar",routerUsuarioAdmin);
 let routerUsuarioEstandar = express.Router();
 routerUsuarioEstandar.use(function(req, res, next) {
     console.log("routerUsuarioEstandar");
-    if ( req.session.rol=="usuario" ) {
+    if ( req.session.rol==="usuario" ) {
         // dejamos correr la petición
         next();
     } else {
@@ -174,20 +174,19 @@ routerUsuarioEstandar.use(function(req, res, next) {
     }
 });
 
-//LOGGER
-let log4js = require("log4js");
-log4js.configure({
-    appenders: { myWallapop: { type: "file", filename: "myWallapopLogger.log" } },
-    categories: { default: { appenders: ["myWallapop"], level: "info" } }
-});
-let logger = log4js.getLogger("myWallapop");
-
 //Aplicar routerAdmin
 app.use("/oferta/agregar",routerUsuarioEstandar);
 app.use("/oferta/propias",routerUsuarioEstandar);
 app.use("/oferta/list",routerUsuarioEstandar);
 app.use("/oferta/compradas",routerUsuarioEstandar);
 
+//LOGGER
+const log4js = require("log4js");
+log4js.configure({
+    appenders: { myWallapop: { type: "file", filename: "myWallapopLogger.log" } },
+    categories: { default: { appenders: ["myWallapop"], level: "info" } }
+});
+const logger = log4js.getLogger("myWallapop");
 
 app.use(express.static('public'));
 
@@ -196,6 +195,7 @@ app.set('port',8081);
 app.set('db','mongodb://admin:sdi@mywallapop-shard-00-00.thyhc.mongodb.net:27017,mywallapop-shard-00-01.thyhc.mongodb.net:27017,mywallapop-shard-00-02.thyhc.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-7nrj2v-shard-0&authSource=admin&retryWrites=true&w=majority');
 app.set('clave','abcdefg');
 app.set('crypto',crypto);
+//Creamos una variable para el logger
 app.set('logger',logger);
 
 //Rutas/controladores por lógica

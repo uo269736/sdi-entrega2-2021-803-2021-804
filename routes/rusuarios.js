@@ -7,7 +7,7 @@ module.exports = function(app, swig, gestorBD) {
      * para el administrador
      */
     app.get("/usuario/list", function(req, res) {
-        gestorBD.obtenerUsuarios({},function(usuarios, total ) {
+        gestorBD.obtenerUsuarios({},function(usuarios) {
             if (usuarios == null) {
                 let respuestaError = swig.renderFile('views/error.html',
                     {
@@ -16,6 +16,7 @@ module.exports = function(app, swig, gestorBD) {
                         rol : req.session.rol,
                         saldo : req.session.saldo
                     });
+                app.get("logger").info("ERROR : No se han podido listar los usuarios");
                 res.send(respuestaError);
             } else {
                 let respuesta = swig.renderFile('views/busuarios.html',
@@ -25,6 +26,7 @@ module.exports = function(app, swig, gestorBD) {
                         rol : req.session.rol,
                         saldo : req.session.saldo
                     });
+                app.get("logger").info("Usuarios listados con éxito");
                 res.send(respuesta);
             }
         });
@@ -39,7 +41,7 @@ module.exports = function(app, swig, gestorBD) {
         let usuariosIds =req.body.idChecked;
         let array=Array.isArray(req.body.idChecked);
         let error=false;
-        if (usuariosIds!=undefined){
+        if (usuariosIds!==undefined){
             for (let i = 0; i < usuariosIds.length; i++){
                 let criterio = {"email": usuariosIds[i]};
                 let criterioOfertas =
@@ -72,7 +74,7 @@ module.exports = function(app, swig, gestorBD) {
                 }
             }
         }
-        if(error==true){
+        if(error===true){
             let respuestaError = swig.renderFile('views/error.html',
                 {
                     mensajes: "Error al eliminar",
@@ -80,8 +82,10 @@ module.exports = function(app, swig, gestorBD) {
                     rol: req.session.rol,
                     saldo : req.session.saldo
                 });
+            app.get("logger").info("ERROR: No se ha podido eliminar el usuario/s seleccionado/s");
             res.send(respuestaError);
         }else{
+            app.get("logger").info("Usuario/s eliminado/s con éxito");
             res.redirect("/usuario/list?mensaje=Usuario/s eliminado/s correctamente");
         }
     });
@@ -93,6 +97,7 @@ module.exports = function(app, swig, gestorBD) {
      */
     app.get("/registrarse", function(req, res) {
         let respuesta = swig.renderFile('views/bregistro.html', {});
+        app.get("logger").info("Accediendo a la vista de registro");
         res.send(respuesta);
     });
 
@@ -117,12 +122,24 @@ module.exports = function(app, swig, gestorBD) {
     app.get("/home", function(req, res) {
         let criterio = { "destacada" : true };
         gestorBD.obtenerOfertas(criterio, function (ofertas) {
+            if(ofertas == null){
+                let respuestaError = swig.renderFile('views/error.html',
+                    {
+                        mensajes : "Error al listar",
+                        usuario : req.session.usuario,
+                        rol : req.session.rol,
+                        saldo : req.session.saldo
+                    });
+                app.get("logger").info("ERROR : En el home del usuario "+req.session.usuario+" no se han podido cargar las ofertas destacadas");
+                res.send(respuestaError);
+            }
             let respuesta = swig.renderFile('views/home.html', {
                 usuario : req.session.usuario,
                 rol : req.session.rol,
                 saldo : req.session.saldo,
                 ofertas : ofertas
             });
+            app.get("logger").info("Accediendo a la página privada del usuario: "+req.session.usuario);
             res.send(respuesta);
         });
     });
@@ -141,7 +158,8 @@ module.exports = function(app, swig, gestorBD) {
             password : seguro
         }
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
-            if (usuarios == null || usuarios.length == 0) {
+            if (usuarios == null || usuarios.length === 0) {
+                app.get("logger").info("ERROR: Inicio de sesión fallido");
                 req.session.usuario = null
                 res.redirect("/identificarse" +
                     "?mensaje=Email o password incorrecto"+
@@ -150,6 +168,7 @@ module.exports = function(app, swig, gestorBD) {
                 req.session.rol = usuarios[0].rol;
                 req.session.usuario = usuarios[0].email;
                 req.session.saldo = usuarios[0].saldo;
+                app.get("logger").info("Inicio de sesión correcto del usuario: "+req.session.usuario);
                 res.redirect("/home");
             }
         });
@@ -161,6 +180,7 @@ module.exports = function(app, swig, gestorBD) {
      * Desconecta al usuario de sesión y lo redirige al login
      */
     app.get('/desconectarse', function (req, res) {
+        app.get("logger").info("El usuario "+req.session.usuario+" se ha desconectado");
         req.session.usuario = null;
         res.redirect("/identificarse");
     });
@@ -185,8 +205,8 @@ module.exports = function(app, swig, gestorBD) {
         let mensaje=validacionRegistro(usuario,req.body.password,req.body.passwordc);
         let criterio ={"email": req.body.email};
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
-            if (usuarios == null || usuarios.length==0) {
-                if(mensaje=="") {
+            if (usuarios == null || usuarios.length===0) {
+                if(mensaje==="") {
                     gestorBD.insertarUsuario(usuario, function (id) {
                         if (id == null) {
                             res.redirect("/registrarse?mensaje=Error al registrar usuario");
@@ -194,16 +214,19 @@ module.exports = function(app, swig, gestorBD) {
                             req.session.rol = usuario.rol;
                             req.session.usuario = usuario.email;
                             req.session.saldo = usuario.saldo;
+                            app.get("logger").info("El usuario con email "+req.session.usuario +" ha sido registrado con éxito");
                             res.redirect("/home?mensaje=Nuevo usuario registrado");
                         }
                     });
                 }else{
                     req.session.usuario = null
+                    app.get("logger").info("ERROR: "+mensaje);
                     res.redirect("/registrarse" +
                         "?mensaje="+mensaje+"&tipoMensaje=alert-danger ");
                 }
             } else {
                 req.session.usuario = null
+                app.get("logger").info("ERROR: Ya existe un usuario con el email "+req.body.email);
                 res.redirect("/registrarse" +
                     "?mensaje=Este email ya está en uso<br>"+mensaje+"&tipoMensaje=alert-danger ");
             }
@@ -228,9 +251,9 @@ module.exports = function(app, swig, gestorBD) {
         if (password.length<5){
             mensaje+="La contraseña debe tener al menos 5 caracteres<br>";
         }
-        if (password!=passwordConfirm){
+        if (password!==passwordConfirm){
             mensaje+="Las contraseñas deben ser iguales<br>";
         }
         return mensaje;
-    };
+    }
 };
