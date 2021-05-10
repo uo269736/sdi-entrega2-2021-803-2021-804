@@ -872,7 +872,7 @@ public class SdiEntrega2Tests {
 		// Iniciamos sesion
 		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
 		//Buscamos 1 oferta concreta
-		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.com");
+		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.es");
 		//Vamos al chat
 		PO_View.checkElement(driver, "id", "hablarConVendedor").get(0).click();
 		//Enviamos un mensaje y comprobamos que se envía
@@ -883,7 +883,7 @@ public class SdiEntrega2Tests {
 		PO_View.checkElement(driver, "id", "btn-volver").get(0).click();
 		PO_View.checkElement(driver, "id", "conversaciones").get(0).click();
 		// Comprobamos que la conversacion existe
-		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.com");
+		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.es");
 
 		// Entramos al chat
 		PO_View.checkElement(driver, "id", "entrar-chat").get(0).click();
@@ -901,7 +901,7 @@ public class SdiEntrega2Tests {
 		// Iniciamos sesion
 		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
 		//Buscamos 1 oferta concreta
-		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.com");
+		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.es");
 		//Vamos al chat
 		PO_View.checkElement(driver, "id", "hablarConVendedor").get(0).click();
 		//Enviamos un mensaje para asegurarnos de que la conversacion existe
@@ -911,7 +911,7 @@ public class SdiEntrega2Tests {
 		PO_View.checkElement(driver, "id", "btn-volver").get(0).click();
 		PO_View.checkElement(driver, "id", "conversaciones").get(0).click();
 		// Comprobamos que la conversacion existe
-		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.com");
+		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.es");
 
 		// Entramos al chat
 		PO_View.checkElement(driver, "id", "entrar-chat").get(0).click();
@@ -920,11 +920,11 @@ public class SdiEntrega2Tests {
 		
 		// Volvemos a conversaciones
 		PO_View.checkElement(driver, "id", "btn-volver").get(0).click();
-		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.com");
+		PO_OfertasView.searchOffer(driver, "Película australiana", "probando@uniovi.es");
 		// Entramos al chat
 		PO_View.checkElement(driver, "id", "entrar-chat").get(0).click();
 		// Dejamos que cargue el chat
-		SeleniumUtils.EsperaCargaPagina(driver, "text", "probando@uniovi.com", 3);	// Destinatario de los mensajes
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "probando@uniovi.es", 3);	// Destinatario de los mensajes
 		// Comprobamos que el mensaje enviado existe
 		PO_View.checkElement(driver, "text", "Prueba35-2");
 	}
@@ -1037,13 +1037,12 @@ public class SdiEntrega2Tests {
 		PO_View.checkElement(driver, "id", "btn-volver").get(0).click();
 
 		// Iniciamos sesion con el destinatario del mensaje
-		driver.navigate().refresh();
 		driver.navigate().to("https://localhost:8081/cliente.html");
-		driver.navigate().refresh();
 		PO_LoginView.fillForm(driver, "probando@uniovi.es", "123456");
 		// Vamos a conversaciones
-		SeleniumUtils.EsperaCargaPagina(driver, "text", "Conversaciones", 3);
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "Pato de goma", 5);
 		PO_View.checkElement(driver, "id", "conversaciones").get(0).click();
+		SeleniumUtils.EsperaCargaPagina(driver, "text", "Titulo de la oferta", 5);
 		// Comprobamos que la conversacion existe
 		PO_OfertasView.searchOffer(driver, "australiana", "probando@uniovi.es");
 		
