@@ -28,7 +28,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
 import com.uniovi.tests.pageobjects.PO_Chat;
 //Paquetes con los Page Object
-import com.uniovi.tests.pageobjects.PO_HomeView;
+import com.uniovi.tests.pageobjects.PO_NavView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
 import com.uniovi.tests.pageobjects.PO_OfertaAddView;
 import com.uniovi.tests.pageobjects.PO_OfertasView;
@@ -45,10 +45,9 @@ public class SdiEntrega2Tests {
 	// automÃ¡ticas)):
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
 	// Miguel
-	static String Geckdriver024 = "C:\\Users\\MiguelUni\\Desktop\\TrabajoUniversidadMiguel\\Tercero\\SDI\\Sesion 5\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	//static String Geckdriver024 = "C:\\Users\\MiguelUni\\Desktop\\TrabajoUniversidadMiguel\\Tercero\\SDI\\Sesion 5\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	// Alex
-	// static String Geckdriver024 =
-	// "C:\\Users\\Usuario\\Desktop\\CallateYa\\SDI\\Sesion5\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	static String Geckdriver024 = "C:\\Users\\Usuario\\Desktop\\CallateYa\\SDI\\Sesion5\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	// ComÃºn a Windows y a MACOSX
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
@@ -85,12 +84,15 @@ public class SdiEntrega2Tests {
 	@AfterClass
 	static public void end() {	
 		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario
 		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
 		PO_UserListView.removeUser(driver, "pruebasComprador@uniovi.es");
 		PO_UserListView.removeUser(driver, "prueba2728@email.com");
 		PO_UserListView.removeUser(driver, "pruebas@uniovi.es");
+		// Borramos las ofertas sobrantes
+		database.getCollection("ofertas").findOneAndDelete(new Document("titulo","Prueba 18"));
+		database.getCollection("ofertas").findOneAndDelete(new Document("titulo","Balon de baloncesto"));
 		// Cerramos el navegador al finalizar las pruebas
 		driver.quit();
 		mongoClient.close();
@@ -107,7 +109,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba01() {
 		// Vamos al formulario de registro
-		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_RegisterView.fillForm(driver, "b@email.com", "Josefo", "Perez", "123456", "123456");
 		// Comprobamos que entramos en la sección privada
@@ -119,7 +121,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba02() {
 		// Vamos al formulario de registro
-		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_RegisterView.fillForm(driver, "", "", "", "123456", "123456");
 		// Comprobamos que no cambiamos de página y que no sale mensaje de error
@@ -132,7 +134,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba03() {
 		// Vamos al formulario de registro
-		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_RegisterView.fillForm(driver, "a@email.com", "Josefo", "Perez", "123456", "456789");
 		// Comprobamos que no cambiamos de página y que sale el mensaje de error de las
@@ -145,7 +147,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba04() {
 		// Vamos al formulario de registro
-		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_RegisterView.fillForm(driver, "admin@email.com", "Josefo", "Perez", "123456", "456");
 		// Comprobamos que no cambiamos de página y que sale el mensaje de error de las
@@ -157,7 +159,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba05() {
 		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario
 		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
 		// Comprobamos que entramos en la pagina privada del Admin
@@ -171,7 +173,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba06() {
 		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario
 		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "111111");
 		// Comprobamos que nos sale el error de contraseña o usuario incorrecto
@@ -183,7 +185,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba07() {
 		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario
 		PO_LoginView.fillForm(driver, "", "");
 		// Comprobamos que no nos movemos y que no sale ningún error
@@ -197,7 +199,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba08() {
 		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario
 		PO_LoginView.fillForm(driver, "123@email.com", "111111");
 		// Comprobamos que nos sale el error de contraseña o usuario incorrecto
@@ -210,7 +212,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba09() {
 		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario
 		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
 		// Comprobamos que entramos en la pagina privada del Usuario Estandar
@@ -218,7 +220,7 @@ public class SdiEntrega2Tests {
 		PO_View.checkElement(driver, "text", "Gestion de Ofertas");
 		SeleniumUtils.textoNoPresentePagina(driver, "Gestión de Usuarios");
 		// Ahora nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 		// Comprobamos que sale la página de inicar sesión
 		SeleniumUtils.textoPresentePagina(driver, "Identifícate");
 		SeleniumUtils.textoPresentePagina(driver, "Email:");
@@ -229,7 +231,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba10() {
 		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Probamos si esta el botón desconectar antes de entrar
 		SeleniumUtils.textoNoPresentePagina(driver, "Desconectarse");
 		// Rellenamos el formulario
@@ -239,7 +241,7 @@ public class SdiEntrega2Tests {
 		PO_View.checkElement(driver, "text", "Gestion de Ofertas");
 		SeleniumUtils.textoNoPresentePagina(driver, "Gestión de Usuarios");
 		// Ahora nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 		// Ahora tras desconectarnos comprobamos si esta el botón desconectarse
 		SeleniumUtils.textoNoPresentePagina(driver, "Desconectarse");
 	}
@@ -249,7 +251,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba11() {
 		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario como administrador
 		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
 		// Vamos a la lista de usuarios
@@ -269,7 +271,7 @@ public class SdiEntrega2Tests {
 		}
 		
 		// Ahora nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba12] Ir a la lista de usuarios, borrar el primer usuario de la lista,
@@ -277,7 +279,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba12() {
 		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario como administrador
 		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
 		// Vamos a la lista de usuarios
@@ -300,7 +302,7 @@ public class SdiEntrega2Tests {
 		// Comprobamos que no está el usuario de antes
 		SeleniumUtils.textoNoPresentePagina(driver, "b@email.com");
 		// Ahora nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba13] Ir a la lista de usuarios, borrar el último usuario de la lista,
@@ -309,11 +311,11 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba13() {
 		// Vamos al formulario de registro
-		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_RegisterView.fillForm(driver, "prueba13@email.com", "Josefo", "Perez", "123456", "123456");
 		// Ahora nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 		// Rellenamos el formulario
 		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
 		// Eliminamos el ultimo usuario
@@ -324,7 +326,7 @@ public class SdiEntrega2Tests {
 		// Comprobamos que no está el último elemento
 		SeleniumUtils.EsperaCargaPaginaNoTexto(driver, "prueba13@email.com", 2);
 		// Ahora nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba14] Ir a la lista de usuarios, borrar 3 usuarios, comprobar que la
@@ -333,23 +335,23 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba14() {
 		// Vamos al formulario de registro
-		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_RegisterView.fillForm(driver, "prueba141@email.com", "Josefo", "Perez", "123456", "123456");
 		// Ahora nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 		// Vamos al formulario de registro
-		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_RegisterView.fillForm(driver, "prueba142@email.com", "Josefo", "Perez", "123456", "123456");
 		// Ahora nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 		// Vamos al formulario de registro
-		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_RegisterView.fillForm(driver, "prueba143@email.com", "Josefo", "Perez", "123456", "123456");
 		// Ahora nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 		
 		// Rellenamos el formulario de login
 		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
@@ -378,7 +380,7 @@ public class SdiEntrega2Tests {
 		SeleniumUtils.textoNoPresentePagina(driver, "prueba142@email.com");
 		SeleniumUtils.textoNoPresentePagina(driver, "prueba143@email.com");
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba15] Ir al formulario de alta de oferta, rellenarla con datos válidos y
@@ -387,7 +389,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba15() {
 		// Vamos al formulario de registro
-		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_RegisterView.fillForm(driver, "pruebas@uniovi.es", "Josefo", "Perez", "123456", "123456");
 		// Creamos la oferta
@@ -399,7 +401,7 @@ public class SdiEntrega2Tests {
 		// Comprobamos que la oferta creada esta presente
 		SeleniumUtils.textoPresentePagina(driver, "Prueba 15");
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba16] Ir al formulario de alta de oferta, rellenarla con datos inválidos
@@ -414,7 +416,7 @@ public class SdiEntrega2Tests {
 		//Vemos que seguimos en la misma pagina (error no capturable ya que los input muestran aviso de campo vacio)
 		SeleniumUtils.textoPresentePagina(driver, "Agregar oferta");
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba17] Mostrar el listado de ofertas para dicho usuario y comprobar que
@@ -441,7 +443,7 @@ public class SdiEntrega2Tests {
 		}
 		
 		// Ahora nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba18] Ir a la lista de ofertas, borrar la primera oferta de la lista,
@@ -449,7 +451,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba18() {
 		// Vamos al formulario de login
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_LoginView.fillForm(driver, "pruebas@uniovi.es", "123456");
 		// Creamos una oferta por si no tuviesemos
@@ -468,7 +470,7 @@ public class SdiEntrega2Tests {
 		// Comprobamos que no este la primera oferta
 		SeleniumUtils.textoNoPresentePagina(driver, titulo);
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba19] Ir a la lista de ofertas, borrar la última oferta de la lista,
@@ -477,7 +479,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba19() {
 		// Vamos al formulario de login
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_LoginView.fillForm(driver, "pruebas@uniovi.es", "123456");
 
@@ -497,7 +499,7 @@ public class SdiEntrega2Tests {
 		// Comprobamos que no este la primera oferta
 		SeleniumUtils.textoNoPresentePagina(driver, titulo);
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba20] Hacer una búsqueda con el campo vacío y comprobar que se muestra
@@ -506,7 +508,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba20() {
 		// Vamos al formulario de login
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
 		// Seleccionamos el menu ofertas
@@ -529,7 +531,7 @@ public class SdiEntrega2Tests {
 			assertTrue(check);
 		}
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba21] Hacer una búsqueda escribiendo en el campo un texto que no exista
@@ -553,7 +555,7 @@ public class SdiEntrega2Tests {
 		for(Object titulo : titulos)
 			SeleniumUtils.textoNoPresentePagina(driver, titulo.toString());
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba22] Hacer una búsqueda escribiendo en el campo un texto en minúscula o
@@ -577,7 +579,7 @@ public class SdiEntrega2Tests {
 		// Comprobamos que no se muestran ofertas
 		SeleniumUtils.textoPresentePagina(driver, "Prueba 18");
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba23] Sobre una búsqueda determinada (a elección del desarrollador),
@@ -588,7 +590,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba23() {
 		// Vamos al formulario de registro
-		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_RegisterView.fillForm(driver, "pruebasComprador@uniovi.es", "Comprador", "Comprador", "123456", "123456");
 
@@ -607,7 +609,7 @@ public class SdiEntrega2Tests {
 		// Comprobamos que se actualiza el saldo
 		SeleniumUtils.textoPresentePagina(driver, "96 €");
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba24] Sobre una búsqueda determinada (a elección del desarrollador),
@@ -622,7 +624,7 @@ public class SdiEntrega2Tests {
 		PO_OfertaAddView.creaOferta(driver, "Balon de baloncesto",
 				"Pelota de baloncesto de maxima calidad, sin estrenar.", 96);
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 		// Iniciamos sesion
 		PO_LoginView.fillForm(driver, "pruebasComprador@uniovi.es", "123456");
 		// Seleccionamos el menu ofertas
@@ -640,7 +642,7 @@ public class SdiEntrega2Tests {
 		// Comprobamos el saldo a 0
 		SeleniumUtils.textoPresentePagina(driver, "0 €");
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba25] Sobre una búsqueda determinada (a elección del desarrollador),
@@ -653,7 +655,7 @@ public class SdiEntrega2Tests {
 		PO_OfertaAddView.creaOferta(driver, "Prueba 25",
 				"Pelota de baloncesto de maxima calidad, sin estrenar.", 96);
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_LoginView.fillForm(driver, "pruebasComprador@uniovi.es", "123456");
 		// Comprobamos el saldo
@@ -673,10 +675,10 @@ public class SdiEntrega2Tests {
 		// El saldo no ha variado, la compra no se ha realizado
 		SeleniumUtils.textoPresentePagina(driver, "0 €");
 		// Borramos la oferta creada y Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
 		PO_OfertasView.removeLastOffer(driver);
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba26] Ir a la opción de ofertas compradas del usuario y mostrar la
@@ -696,7 +698,7 @@ public class SdiEntrega2Tests {
 					SeleniumUtils.textoPresentePagina(driver, (String)d.get("titulo"));
 		}
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba27] Al crear una oferta marcar dicha oferta como destacada y a
@@ -707,7 +709,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba27() {
 		// Vamos al formulario de registro
-		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
 		PO_RegisterView.fillForm(driver, "prueba2728@email.com", "prueba2728", "Perez", "123456", "123456");
 		// Comprobamos que el saldo del usuario es el que tiene que ser
@@ -722,7 +724,7 @@ public class SdiEntrega2Tests {
 		// Comprobamos que el saldo del usuario sea el del principio menos 20
 		SeleniumUtils.textoPresentePagina(driver, "80 €");
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba28] Sobre el listado de ofertas de un usuario con menos de 20 euros de
@@ -734,7 +736,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba28() {
 		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario
 		PO_LoginView.fillForm(driver, "prueba2728@email.com", "123456");
 		// Comprobamos que el saldo del usuario es el que tiene que ser
@@ -757,7 +759,7 @@ public class SdiEntrega2Tests {
 		// Comprobamos que el saldo del usuario sea el del principio menos 20
 		SeleniumUtils.textoPresentePagina(driver, "60 €");
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba29] Sobre el listado de ofertas de un usuario con menos de 20 euros de
@@ -767,7 +769,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void Prueba29() {
 		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario
 		PO_LoginView.fillForm(driver, "pruebasComprador@uniovi.es", "123456");
 		// Creamos la oferta
@@ -786,7 +788,7 @@ public class SdiEntrega2Tests {
 		//Comprobamos que nos sale el mensaje de que no tienes saldo suficiente
 		SeleniumUtils.textoPresentePagina(driver, "No tienes suficiente dinero para destacar esta oferta");
 		// Nos desconectamos
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 	// [Prueba30] Inicio de sesión con datos válidos.
@@ -1047,21 +1049,21 @@ public class SdiEntrega2Tests {
 		PO_OfertasView.searchOffer(driver, "australiana", "probando@uniovi.es");
 		
 		// Entramos al chat
-		PO_View.checkElement(driver, "id", "entrar-chat").get(0).click();
+		PO_View.checkElement(driver, "id", "entrar-chat").get(1).click();
 		// Comprobamos que ahora el mensaje esta leido
 		SeleniumUtils.EsperaCargaPagina(driver, "text", "Película australiana", 5);
-		SeleniumUtils.EsperaCargaPagina(driver, "text", "Prueba 39", 5);
-		SeleniumUtils.EsperaCargaPagina(driver, "text", "Leido", 5);
+		SeleniumUtils.textoPresentePagina(driver, "Prueba 39");
+		SeleniumUtils.textoPresentePagina(driver, "Leido");
 		driver.navigate().to("https://localhost:8081/home");
-		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
 	}
 
 
-	// [Prueba5b] Inicio de sesión con datos válidos (usuario estándar).
+	// [Prueba41] Inicio de sesión con datos válidos (usuario estándar).
 	@Test
-	public void Prueba05b() {
+	public void Prueba41() {
 		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario
 		PO_LoginView.fillForm(driver, "prueba@uniovi.es", "123456");
 		// Comprobamos que entramos en la pagina privada del Usuario Estandar
