@@ -78,13 +78,12 @@ public class SdiEntrega2Tests {
 		// COnfiguramos las pruebas.
 		// Fijamos el timeout en cada opciÃ³n de carga de una vista. 2 segundos.
 		PO_View.setTimeout(3);
-
 	}
 
 	@AfterClass
 	static public void end() {	
-		// Vamos al formulario de logueo.
-		PO_NavView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		PO_NavView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+
 		// Rellenamos el formulario
 		PO_LoginView.fillForm(driver, "admin@email.com", "admin");
 		PO_UserListView.removeUser(driver, "pruebasComprador@uniovi.es");
@@ -1070,6 +1069,7 @@ public class SdiEntrega2Tests {
 		PO_View.checkElement(driver, "text", "prueba@uniovi.es");
 		PO_View.checkElement(driver, "text", "Gestion de Ofertas");
 		SeleniumUtils.textoNoPresentePagina(driver, "Gestion de Usuarios");
+		
 	}
 
 }
